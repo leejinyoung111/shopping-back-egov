@@ -18,15 +18,16 @@ package egovframework.example.sample.web;
 import java.util.List;
 
 import egovframework.example.sample.service.BookService;
+import egovframework.example.sample.service.BookVO;
+import egovframework.example.sample.service.CartService;
+import egovframework.example.sample.service.CartVO;
 import egovframework.example.sample.service.EgovSampleService;
-import egovframework.example.sample.service.MemberService;
 import egovframework.example.sample.service.SampleDefaultVO;
 import egovframework.example.sample.service.SampleVO;
 import egovframework.example.sample.service.UserService;
 import egovframework.example.sample.service.UserVO;
 
 import org.egovframe.rte.fdl.property.EgovPropertyService;
-import org.egovframe.rte.psl.dataaccess.util.EgovMap;
 import org.egovframe.rte.ptl.mvc.tags.ui.pagination.PaginationInfo;
 
 import javax.annotation.Resource;
@@ -74,25 +75,26 @@ public class EgovSampleController {
 	/** Validator */
 	@Resource(name = "beanValidator")
 	protected DefaultBeanValidator beanValidator;
-	
-    @Autowired private MemberService memberservice;
+
     
 	@Resource(name = "userService")
 	private UserService userService;
 	
-	 // @Resource(name = "bookService")
-	 // private BookService bookService;
+	@Resource(name = "bookService")
+	private BookService bookService;
+	
+	@Resource(name = "cartService")
+	private CartService cartService;
 	
 	
 	
     // 메인 페이지
 	@RequestMapping(value = "/main.do")
 	public String main(Model model) throws Exception {
-		int num = memberservice.select_membercount();	
-		String getName = memberservice.selectName();	
-		// List<?> getBookList = bookService.bookList();	
-		model.addAttribute("num", num);
-		model.addAttribute("getName", getName);
+		 List<?> getBookList = bookService.bookList();
+		 List<?> getCartList = cartService.cartList();	
+		model.addAttribute("getBookList", getBookList);
+		model.addAttribute("getCartList", getCartList);
 		return "sample/main";
 	}
 	
@@ -150,6 +152,27 @@ public class EgovSampleController {
 
 	}
 
+	// 장바구니 페이지
+	@RequestMapping(value = "/cart.do", method = RequestMethod.GET)
+	public String card() throws Exception {
+		return "sample/cart";
+	}
+	
+	// 장바구니 추가 기능
+	@RequestMapping(value = "/cartAction.do", method = RequestMethod.POST)
+	public String cartAction(CartVO vo) throws Exception {
+		
+		// 상품 존재 체크
+		CartVO resultVO = cartService.cartCheck(vo);
+		
+		if (resultVO == null) {
+			cartService.insertCart(vo);
+			return "redirect:/main.do";
+		} else {
+			System.out.println("이미 존재하는 상품입니다.");
+		return null;
+		}
+	}
 
 	/**
 	 * 글 목록을 조회한다. (pageing)
