@@ -49,6 +49,11 @@
 		<servlet-name>action</servlet-name>
 		<url-pattern>*.do</url-pattern>
 	</servlet-mapping>
+	
+	<servlet-mapping>
+		<servlet-name>action</servlet-name>
+		<url-pattern>*.json</url-pattern>
+	</servlet-mapping>
     
 	<welcome-file-list>
 		<welcome-file>index.jsp</welcome-file>
@@ -70,5 +75,6 @@
 		<error-code>500</error-code>
 		<location>/common/error.jsp</location>
 	</error-page>
+
     
 </web-app>

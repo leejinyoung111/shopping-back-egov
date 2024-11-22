@@ -18,7 +18,6 @@ package egovframework.example.sample.web;
 import java.util.List;
 
 import egovframework.example.sample.service.BookService;
-import egovframework.example.sample.service.BookVO;
 import egovframework.example.sample.service.CartService;
 import egovframework.example.sample.service.CartVO;
 import egovframework.example.sample.service.EgovSampleService;
@@ -31,16 +30,16 @@ import org.egovframe.rte.fdl.property.EgovPropertyService;
 import org.egovframe.rte.ptl.mvc.tags.ui.pagination.PaginationInfo;
 
 import javax.annotation.Resource;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
+
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+
 import org.springframework.web.bind.support.SessionStatus;
 import org.springmodules.validation.commons.DefaultBeanValidator;
 
@@ -85,7 +84,6 @@ public class EgovSampleController {
 	
 	@Resource(name = "cartService")
 	private CartService cartService;
-	
 	
 	
     // 메인 페이지
