@@ -17,12 +17,16 @@ package egovframework.example.sample.web;
 
 import java.util.List;
 
+import egovframework.example.sample.service.BookService;
 import egovframework.example.sample.service.EgovSampleService;
 import egovframework.example.sample.service.MemberService;
 import egovframework.example.sample.service.SampleDefaultVO;
 import egovframework.example.sample.service.SampleVO;
+import egovframework.example.sample.service.UserService;
+import egovframework.example.sample.service.UserVO;
 
 import org.egovframe.rte.fdl.property.EgovPropertyService;
+import org.egovframe.rte.psl.dataaccess.util.EgovMap;
 import org.egovframe.rte.ptl.mvc.tags.ui.pagination.PaginationInfo;
 
 import javax.annotation.Resource;
@@ -72,16 +76,80 @@ public class EgovSampleController {
 	protected DefaultBeanValidator beanValidator;
 	
     @Autowired private MemberService memberservice;
+    
+	@Resource(name = "userService")
+	private UserService userService;
 	
+	 // @Resource(name = "bookService")
+	 // private BookService bookService;
+	
+	
+	
+    // 메인 페이지
 	@RequestMapping(value = "/main.do")
 	public String main(Model model) throws Exception {
 		int num = memberservice.select_membercount();	
 		String getName = memberservice.selectName();	
+		// List<?> getBookList = bookService.bookList();	
 		model.addAttribute("num", num);
 		model.addAttribute("getName", getName);
 		return "sample/main";
 	}
 	
+	// 회원가입 페이지
+	@RequestMapping(value = "/register.do", method = RequestMethod.GET)
+	public String register() throws Exception {
+		return "sample/register";
+	}
+	
+	// 회원가입 기능
+	@RequestMapping(value = "/registerSave.do", method = RequestMethod.POST)
+	public String registerSave(UserVO vo) throws Exception {
+		
+		// 이메일 검색
+		UserVO resultVO = userService.isEmail(vo);
+		
+		if (resultVO == null) {
+			userService.insertUser(vo);
+			return "redirect:/login.do";
+		} else {
+			System.out.println("이미 존재하는 이메일입니다.");
+			return null;
+		}
+	}
+	
+	// 로그인 페이지
+	@RequestMapping(value = "/login.do", method = RequestMethod.GET)
+	public String login() throws Exception {
+		return "sample/login";
+	}
+	
+	// 로그인 기능
+	@RequestMapping(value = "/loginAction.do", method = RequestMethod.POST)
+	public String loginAction(UserVO vo, Model model) throws Exception {
+		
+		// 이메일 검색
+		UserVO resultVO = userService.isEmail(vo);
+		
+		// 비밀번호 매치
+		UserVO passwordMatchVO = userService.passwordMatch(vo);
+		
+		if (resultVO == null) {
+			System.out.println("존재하지 않은 이메일입니다.");
+			return null;
+		} else {
+			
+			if (passwordMatchVO == null) {
+				System.out.println("비밀번호가 일치하지 않습니다.");
+				return null;
+			} else {
+				model.addAttribute("user", passwordMatchVO);
+				return "forward:/main.do";
+			}
+		}
+
+	}
+
 
 	/**
 	 * 글 목록을 조회한다. (pageing)
