@@ -19,6 +19,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Resource;
+
 import egovframework.example.sample.service.BookService;
 import egovframework.example.sample.service.BookVO;
 import egovframework.example.sample.service.EgovSampleService;
@@ -28,12 +30,11 @@ import egovframework.example.sample.service.SampleVO;
 import org.egovframe.rte.fdl.property.EgovPropertyService;
 import org.egovframe.rte.ptl.mvc.tags.ui.pagination.PaginationInfo;
 
-import javax.annotation.Resource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
-
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -61,6 +62,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  *  Copyright (C) by MOPAS All right reserved.
  */
 
+@CrossOrigin(origins = "*")
 @Controller
 @RestController
 public class EgovSampleController {
@@ -84,7 +86,7 @@ public class EgovSampleController {
 	
 	
     // 메인 페이지
-	@RequestMapping(value = "/test", method = RequestMethod.GET, produces="application/json;charset=utf-8", consumes="application/json;charset=utf-8")
+	@RequestMapping(value = "/test", method = RequestMethod.GET, produces="application/json;charset=utf-8")
 	public String test() throws Exception {
 		
 //		Map<String, Object> response = new HashMap<>();
