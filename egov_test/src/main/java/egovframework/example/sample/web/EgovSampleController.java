@@ -15,16 +15,15 @@
  */
 package egovframework.example.sample.web;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import egovframework.example.sample.service.BookService;
-import egovframework.example.sample.service.CartService;
-import egovframework.example.sample.service.CartVO;
+import egovframework.example.sample.service.BookVO;
 import egovframework.example.sample.service.EgovSampleService;
 import egovframework.example.sample.service.SampleDefaultVO;
 import egovframework.example.sample.service.SampleVO;
-import egovframework.example.sample.service.UserService;
-import egovframework.example.sample.service.UserVO;
 
 import org.egovframe.rte.fdl.property.EgovPropertyService;
 import org.egovframe.rte.ptl.mvc.tags.ui.pagination.PaginationInfo;
@@ -39,9 +38,11 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springmodules.validation.commons.DefaultBeanValidator;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @Class Name : EgovSampleController.java
@@ -61,6 +62,7 @@ import org.springmodules.validation.commons.DefaultBeanValidator;
  */
 
 @Controller
+@RestController
 public class EgovSampleController {
 
 	/** EgovSampleService */
@@ -76,101 +78,110 @@ public class EgovSampleController {
 	protected DefaultBeanValidator beanValidator;
 
     
-	@Resource(name = "userService")
-	private UserService userService;
 	
 	@Resource(name = "bookService")
 	private BookService bookService;
 	
-	@Resource(name = "cartService")
-	private CartService cartService;
-	
 	
     // 메인 페이지
-	@RequestMapping(value = "/main.do")
-	public String main(Model model) throws Exception {
-		 List<?> getBookList = bookService.bookList();
-		 List<?> getCartList = cartService.cartList();	
-		model.addAttribute("getBookList", getBookList);
-		model.addAttribute("getCartList", getCartList);
-		return "sample/main";
+	@RequestMapping(value = "/test", method = RequestMethod.GET, produces="application/json;charset=utf-8", consumes="application/json;charset=utf-8")
+	public String test() throws Exception {
+		
+//		Map<String, Object> response = new HashMap<>();
+//		response.put("id", 1);
+//		response.put("title", "책");
+//		ObjectMapper objectMapper = new ObjectMapper();
+//		String jsonString = objectMapper.writeValueAsString(response);
+//		System.out.println(jsonString);
+		List<BookVO> getBookList = bookService.bookList();
+	
+		
+		Map<String, Object> response = new HashMap<>();
+		response.put("getBookList", getBookList);
+		
+		ObjectMapper objectMapper = new ObjectMapper();
+		String jsonString = objectMapper.writeValueAsString(response);
+		
+		System.out.println(jsonString);
+	        
+		return jsonString;
 	}
 	
 	// 회원가입 페이지
-	@RequestMapping(value = "/register.do", method = RequestMethod.GET)
-	public String register() throws Exception {
-		return "sample/register";
-	}
+//	@RequestMapping(value = "/register.do", method = RequestMethod.GET)
+//	public String register() throws Exception {
+//		return "sample/register";
+//	}
 	
 	// 회원가입 기능
-	@RequestMapping(value = "/registerSave.do", method = RequestMethod.POST)
-	public String registerSave(UserVO vo) throws Exception {
-		
-		// 이메일 검색
-		UserVO resultVO = userService.isEmail(vo);
-		
-		if (resultVO == null) {
-			userService.insertUser(vo);
-			return "redirect:/login.do";
-		} else {
-			System.out.println("이미 존재하는 이메일입니다.");
-			return null;
-		}
-	}
+//	@RequestMapping(value = "/registerSave.do", method = RequestMethod.POST)
+//	public String registerSave(UserVO vo) throws Exception {
+//		
+//		// 이메일 검색
+//		UserVO resultVO = userService.isEmail(vo);
+//		
+//		if (resultVO == null) {
+//			userService.insertUser(vo);
+//			return "redirect:/login.do";
+//		} else {
+//			System.out.println("이미 존재하는 이메일입니다.");
+//			return null;
+//		}
+//	}
 	
 	// 로그인 페이지
-	@RequestMapping(value = "/login.do", method = RequestMethod.GET)
-	public String login() throws Exception {
-		return "sample/login";
-	}
+//	@RequestMapping(value = "/login.do", method = RequestMethod.GET)
+//	public String login() throws Exception {
+//		return "sample/login";
+//	}
 	
 	// 로그인 기능
-	@RequestMapping(value = "/loginAction.do", method = RequestMethod.POST)
-	public String loginAction(UserVO vo, Model model) throws Exception {
-		
-		// 이메일 검색
-		UserVO resultVO = userService.isEmail(vo);
-		
-		// 비밀번호 매치
-		UserVO passwordMatchVO = userService.passwordMatch(vo);
-		
-		if (resultVO == null) {
-			System.out.println("존재하지 않은 이메일입니다.");
-			return null;
-		} else {
-			
-			if (passwordMatchVO == null) {
-				System.out.println("비밀번호가 일치하지 않습니다.");
-				return null;
-			} else {
-				model.addAttribute("user", passwordMatchVO);
-				return "forward:/main.do";
-			}
-		}
-
-	}
+//	@RequestMapping(value = "/loginAction.do", method = RequestMethod.POST)
+//	public String loginAction(UserVO vo, Model model) throws Exception {
+//		
+//		// 이메일 검색
+//		UserVO resultVO = userService.isEmail(vo);
+//		
+//		// 비밀번호 매치
+//		UserVO passwordMatchVO = userService.passwordMatch(vo);
+//		
+//		if (resultVO == null) {
+//			System.out.println("존재하지 않은 이메일입니다.");
+//			return null;
+//		} else {
+//			
+//			if (passwordMatchVO == null) {
+//				System.out.println("비밀번호가 일치하지 않습니다.");
+//				return null;
+//			} else {
+//				model.addAttribute("user", passwordMatchVO);
+//				return "forward:/main.do";
+//			}
+//		}
+//
+//	}
 
 	// 장바구니 페이지
-	@RequestMapping(value = "/cart.do", method = RequestMethod.GET)
-	public String card() throws Exception {
-		return "sample/cart";
-	}
+//	@RequestMapping(value = "/cart.do", method = RequestMethod.GET)
+//	public String card() throws Exception {
+//		return "sample/cart";
+//	}
 	
 	// 장바구니 추가 기능
-	@RequestMapping(value = "/cartAction.do", method = RequestMethod.POST)
-	public String cartAction(CartVO vo) throws Exception {
-		
-		// 상품 존재 체크
-		CartVO resultVO = cartService.cartCheck(vo);
-		
-		if (resultVO == null) {
-			cartService.insertCart(vo);
-			return "redirect:/main.do";
-		} else {
-			System.out.println("이미 존재하는 상품입니다.");
-		return null;
-		}
-	}
+//	@RequestMapping(value = "/cartAction.do", method = RequestMethod.POST)
+//	public String cartAction(CartVO vo) throws Exception {
+//		
+//		// 상품 존재 체크
+//		CartVO resultVO = cartService.cartCheck(vo);
+//		
+//		if (resultVO == null) {
+//			cartService.insertCart(vo);
+//			return "redirect:/main.do";
+//		} else {
+//			System.out.println("이미 존재하는 상품입니다.");
+//		return null;
+//		}
+//	}
 
 	/**
 	 * 글 목록을 조회한다. (pageing)
