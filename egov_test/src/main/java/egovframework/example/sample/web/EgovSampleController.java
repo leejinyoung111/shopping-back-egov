@@ -18,16 +18,12 @@ package egovframework.example.sample.web;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-
 import egovframework.example.sample.service.BookService;
 import egovframework.example.sample.service.BookVO;
 import egovframework.example.sample.service.CartService;
 import egovframework.example.sample.service.CartVO;
 import egovframework.example.sample.service.EgovSampleService;
-import egovframework.example.sample.service.LoginDTO;
 import egovframework.example.sample.service.SampleDefaultVO;
 import egovframework.example.sample.service.SampleVO;
 import egovframework.example.sample.service.UserService;
@@ -130,23 +126,30 @@ public class EgovSampleController {
 	
 	// 로그인 기능
 	@RequestMapping(value = "/login", method = RequestMethod.POST, produces="application/json;charset=utf-8", consumes="application/json;charset=utf-8")
-	public String login(@RequestBody LoginDTO dto) throws Exception{
+	public Map<String, Object>  login(@RequestBody UserVO vo) {
 		try {
-			Boolean login = userService.login(dto);
+			Map<String, Object> login = userService.login(vo);
+			Map<String, Object> response = new HashMap<>();
 			
-			System.out.println(login);
-			return "로그인 성공!";
+			response.put("user", login);
+			
+			System.out.println(response);
+			return response;
 			
 		} catch (Exception e) {
-			System.out.println("발생 오류:" + e);
-			return "발생 오류:" + e;
+            e.printStackTrace();
+            System.out.println("발생 오류:" + e);
+            
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", "유저정보를 가져오는 중 오류가 발생했습니다.");
+            return errorResponse;
 		}
+
 	}
 	
     // 장바구니 목록 조회
 	@RequestMapping(value = "/cart/{userId}", method = RequestMethod.GET, produces="application/json;charset=utf-8")
 	public Map<String, Object> cartList(@PathVariable("userId") int userId) throws Exception {
-//		System.out.println(userId);
 		List<CartVO> getCartList = cartService.cartList(userId);
 		Map<String, Object> response = new HashMap<>();
 		response.put("getCartList", getCartList);
