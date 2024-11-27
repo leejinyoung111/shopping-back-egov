@@ -17,6 +17,15 @@
         <property name="webBindingInitializer">
             <bean class="egovframework.example.cmmn.web.EgovBindingInitializer"/>
         </property>
+        
+        <!-- json convert bean 추가 start -->
+        <property name="messageConverters">
+        	<list>
+            	<bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter" />
+        	</list>
+   		</property>
+   		 <!-- json convert bean 추가 end -->
+   		 
     </bean>
     <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping">
         <property name="interceptors">

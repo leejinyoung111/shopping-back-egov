@@ -24,25 +24,26 @@ import javax.annotation.Resource;
 import egovframework.example.sample.service.BookService;
 import egovframework.example.sample.service.BookVO;
 import egovframework.example.sample.service.EgovSampleService;
+import egovframework.example.sample.service.LoginDTO;
 import egovframework.example.sample.service.SampleDefaultVO;
 import egovframework.example.sample.service.SampleVO;
-
+import egovframework.example.sample.service.UserService;
+import egovframework.example.sample.service.UserVO;
 import org.egovframe.rte.fdl.property.EgovPropertyService;
 import org.egovframe.rte.ptl.mvc.tags.ui.pagination.PaginationInfo;
-
-import org.springframework.stereotype.Controller;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springmodules.validation.commons.DefaultBeanValidator;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
@@ -62,8 +63,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  *  Copyright (C) by MOPAS All right reserved.
  */
 
+// cors 선언
 @CrossOrigin(origins = "*")
-@Controller
+
+// rest api 선언
 @RestController
 public class EgovSampleController {
 
@@ -79,25 +82,21 @@ public class EgovSampleController {
 	@Resource(name = "beanValidator")
 	protected DefaultBeanValidator beanValidator;
 
+	 
+	@Autowired
     
 	
 	@Resource(name = "bookService")
 	private BookService bookService;
 	
+	@Resource(name = "userService")
+	private UserService userService;
+	
 	
     // 메인 페이지
 	@RequestMapping(value = "/test", method = RequestMethod.GET, produces="application/json;charset=utf-8")
 	public String test() throws Exception {
-		
-//		Map<String, Object> response = new HashMap<>();
-//		response.put("id", 1);
-//		response.put("title", "책");
-//		ObjectMapper objectMapper = new ObjectMapper();
-//		String jsonString = objectMapper.writeValueAsString(response);
-//		System.out.println(jsonString);
 		List<BookVO> getBookList = bookService.bookList();
-	
-		
 		Map<String, Object> response = new HashMap<>();
 		response.put("getBookList", getBookList);
 		
@@ -107,6 +106,34 @@ public class EgovSampleController {
 		System.out.println(jsonString);
 	        
 		return jsonString;
+	}
+	
+	// 회원가입 기능
+	@RequestMapping(value = "/register", method = RequestMethod.POST, produces="application/json;charset=utf-8", consumes="application/json;charset=utf-8")
+	public String register(@RequestBody UserVO vo) throws Exception{
+		try {
+			userService.register(vo);
+			return "회원가입 성공!";
+			
+		} catch (Exception e) {
+			System.out.println("발생 오류:" + e);
+			return "발생 오류:" + e;
+		}
+	}
+	
+	// 로그인 기능
+	@RequestMapping(value = "/login", method = RequestMethod.POST, produces="application/json;charset=utf-8", consumes="application/json;charset=utf-8")
+	public String login(@RequestBody LoginDTO dto) throws Exception{
+		try {
+			Boolean login = userService.login(dto);
+			
+			System.out.println(login);
+			return "로그인 성공!";
+			
+		} catch (Exception e) {
+			System.out.println("발생 오류:" + e);
+			return "발생 오류:" + e;
+		}
 	}
 	
 	// 회원가입 페이지
