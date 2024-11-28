@@ -19,13 +19,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Resource;
-import egovframework.example.sample.service.BookService;
-import egovframework.example.sample.service.BookVO;
 import egovframework.example.sample.service.CartService;
 import egovframework.example.sample.service.CartVO;
 import egovframework.example.sample.service.EgovSampleService;
 import egovframework.example.sample.service.SampleDefaultVO;
 import egovframework.example.sample.service.SampleVO;
+import egovframework.example.sample.service.TestService;
+import egovframework.example.sample.service.TestVO;
 import egovframework.example.sample.service.UserService;
 import egovframework.example.sample.service.UserVO;
 import org.egovframe.rte.fdl.property.EgovPropertyService;
@@ -44,7 +44,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springmodules.validation.commons.DefaultBeanValidator;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @Class Name : EgovSampleController.java
@@ -84,10 +83,6 @@ public class EgovSampleController {
 
 	 
 	@Autowired
-    
-	
-	@Resource(name = "bookService")
-	private BookService bookService;
 	
 	@Resource(name = "userService")
 	private UserService userService;
@@ -95,21 +90,31 @@ public class EgovSampleController {
 	@Resource(name = "cartService")
 	private CartService cartService;
 	
+	@Resource(name = "testService")
+	private TestService testService;
+	
+
 	
     // 메인 페이지
 	@RequestMapping(value = "/test", method = RequestMethod.GET, produces="application/json;charset=utf-8")
 	public String test() throws Exception {
-		List<BookVO> getBookList = bookService.bookList();
-		Map<String, Object> response = new HashMap<>();
-		response.put("getBookList", getBookList);
+		return "테스트 페이지";
 		
-		ObjectMapper objectMapper = new ObjectMapper();
-		String jsonString = objectMapper.writeValueAsString(response);
-		
-		System.out.println(jsonString);
-	        
-		return jsonString;
 	}
+	
+	// 비밀번호 테스트
+	@RequestMapping(value = "/insertUser", method = RequestMethod.POST, produces="application/json;charset=utf-8", consumes="application/json;charset=utf-8")
+	public String insertUser(@RequestBody TestVO vo) throws Exception{
+		try {
+			testService.insertUser(vo);
+			return "비밀번호 테스트중!";
+			
+		} catch (Exception e) {
+			System.out.println("발생 오류:" + e);
+			return "발생 오류:" + e;
+		}
+	}
+	
 	
 	// 회원가입 기능
 	@RequestMapping(value = "/register", method = RequestMethod.POST, produces="application/json;charset=utf-8", consumes="application/json;charset=utf-8")
