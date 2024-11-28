@@ -84,6 +84,7 @@ public class EgovSampleController {
 	 
 	@Autowired
 	
+	
 	@Resource(name = "userService")
 	private UserService userService;
 	
@@ -104,15 +105,22 @@ public class EgovSampleController {
 	
 	// 비밀번호 테스트
 	@RequestMapping(value = "/insertUser", method = RequestMethod.POST, produces="application/json;charset=utf-8", consumes="application/json;charset=utf-8")
-	public String insertUser(@RequestBody TestVO vo) throws Exception{
-		try {
-			testService.insertUser(vo);
-			return "비밀번호 테스트중!";
-			
-		} catch (Exception e) {
-			System.out.println("발생 오류:" + e);
-			return "발생 오류:" + e;
-		}
+	public void insertUser(@RequestBody TestVO vo) throws Exception{
+		
+		String password = vo.getPassword();
+		
+		System.out.println(password);
+
+		
+//		 ;
+//		try {
+//			testService.insertUser(vo);
+//			return "비밀번호 테스트중!";
+//			
+//		} catch (Exception e) {
+//			System.out.println("발생 오류:" + e);
+//			return "발생 오류:" + e;
+//		}
 	}
 	
 	

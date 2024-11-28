@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="egovframework.example.sample.service.impl.TestMapper">
+
+	<resultMap id="test" type="egovframework.example.sample.service.TestVO">
+		<id property="id" column="id"/>
+		<result property="name" column="name"/>
+		<result property="password" column="password"/>
+	</resultMap>
+	
+
+	<!-- 비밀번호 테스트 -->
+	<insert id="insertUser" parameterType="TestVO">
+		insert in to test_user (name, password)
+						values ( #{name}, #{password})
+	</insert>
+	
+	
+</mapper>
