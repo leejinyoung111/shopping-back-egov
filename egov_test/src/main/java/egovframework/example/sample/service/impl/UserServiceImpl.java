@@ -19,8 +19,6 @@ public class UserServiceImpl extends EgovAbstractServiceImpl implements UserServ
 	@Override
 	public int emailCheck(String email) throws Exception {
 		int resultVO = userDAO.emailCheck(email);
-//		if (resultVO == null)
-//			throw processException("info.nodata.msg");
 		return resultVO;
 	}
 	

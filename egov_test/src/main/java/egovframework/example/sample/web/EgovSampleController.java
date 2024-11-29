@@ -22,14 +22,16 @@ import javax.annotation.Resource;
 import egovframework.example.sample.service.CartService;
 import egovframework.example.sample.service.CartVO;
 import egovframework.example.sample.service.EgovSampleService;
+import egovframework.example.sample.service.JwtService;
 import egovframework.example.sample.service.SampleDefaultVO;
 import egovframework.example.sample.service.SampleVO;
 import egovframework.example.sample.service.TestService;
 import egovframework.example.sample.service.TestVO;
+import egovframework.example.sample.service.TokenVO;
 import egovframework.example.sample.service.UserService;
 import egovframework.example.sample.service.UserVO;
+import io.jsonwebtoken.Claims;
 
-import org.egovframe.rte.fdl.cryptography.EgovEnvCryptoService;
 import org.egovframe.rte.fdl.cryptography.EgovPasswordEncoder;
 import org.egovframe.rte.fdl.property.EgovPropertyService;
 import org.egovframe.rte.ptl.mvc.tags.ui.pagination.PaginationInfo;
@@ -96,6 +98,8 @@ public class EgovSampleController {
 	@Resource(name = "testService")
 	private TestService testService;
 	
+	@Resource(name = "jwtService")
+	private JwtService jwtService;
 	
 	
     // 메인 페이지
@@ -103,62 +107,11 @@ public class EgovSampleController {
 	public String test() throws Exception {
 		return "테스트 페이지";
 		
-	}
-	
-	// 비밀번호 암호화 테스트
-	@RequestMapping(value = "/insertUser", method = RequestMethod.POST, produces="application/json;charset=utf-8", consumes="application/json;charset=utf-8")
-	public String insertUser(@RequestBody TestVO vo) throws Exception{
-		try {
-			
-			// 인코더 선언
-			EgovPasswordEncoder egovPasswordEncoder = new EgovPasswordEncoder();
-			
-			// 비밀번호 암호화
-			String hashed = egovPasswordEncoder.encryptPassword(vo.getPassword());
-			
-			// 암호화된 비밀번호로 바꾸기
-			vo.setPassword(hashed);	
-			
-			testService.insertUser(vo);
-			
-			return "비밀번호 테스트중!";
-			
-		} catch (Exception e) {
-			System.out.println("발생 오류:" + e);
-			return "발생 오류:" + e;
-		}
-	}
-	
-	// 비밀번호 복호화 테스트
-	@RequestMapping(value = "/getUser", method = RequestMethod.POST, produces="application/json;charset=utf-8", consumes="application/json;charset=utf-8")
-	public String getUser(@RequestBody TestVO vo) throws Exception{
-		try {
-			
-			// 인코더 선언
-			EgovPasswordEncoder egovPasswordEncoder = new EgovPasswordEncoder();
-			
-			// 유저 정보 가져오기
-			Map<String, Object> getUser = testService.getUser(vo);
-			
-			// 비밀번호 일치 여부
-			Boolean result = egovPasswordEncoder.checkPassword(vo.getPassword(), (String) getUser.get("password"));
-			
-			if (result) {
-				return "로그인 성공!";
-			} else {
-				return "비밀번호가 다릅니다.";
-			}
-			
-		} catch (Exception e) {
-            e.printStackTrace();
-            return "오류 발생";
-		}
-	}
-	
+	} 
 	
 	// 회원가입 기능
 	@RequestMapping(value = "/register", method = RequestMethod.POST, produces="application/json;charset=utf-8", consumes="application/json;charset=utf-8")
-	public String register(@RequestBody UserVO vo) {
+	public String register(@RequestBody UserVO vo) throws Exception {
 		try {
 			
 			// 인코더 선언
@@ -176,13 +129,14 @@ public class EgovSampleController {
 				// 암호화된 비밀번호로 바꾸기
 				vo.setPassword(hashed);
 				
+				// 회원가입
 				userService.register(vo);
 				
 				return "회원가입 성공!";
+				
+			
 			} else {
 				// 일치하는 이메일이 있는 경우
-				
-				System.out.println("존재하는 이메일입니다.");
 				return "존재하는 이메일입니다.";
 			}
 			
@@ -194,55 +148,50 @@ public class EgovSampleController {
 	
 	// 로그인 기능
 	@RequestMapping(value = "/login", method = RequestMethod.POST, produces="application/json;charset=utf-8", consumes="application/json;charset=utf-8")
-	public Map<String, Object>  login(@RequestBody UserVO vo) {
+	public Map<String, Object>  login(@RequestBody UserVO vo) throws Exception {
 		try {
-			
-			// 해시맵 선언
-			Map<String, Object> response = new HashMap<>();
 			
 			// 인코더 선언
 			EgovPasswordEncoder egovPasswordEncoder = new EgovPasswordEncoder();
+			
+			// 해시맵 선언
+			Map<String, Object> response = new HashMap<>();
+			Map<String, Object> errorResponse = new HashMap<>();
 			
 			// 이메일 체크
 			int isEmail = userService.emailCheck(vo.getEmail());
 			
 			if (isEmail == 0) {
 				// 일치하는 이메일이 없는 경우
-	            Map<String, Object> errorResponse = new HashMap<>();
 	            errorResponse.put("오류 발생", "일치하는 이메일이 없습니다.");
-	            
 	            return errorResponse;
 
 			} else {
 				// 일치하는 이메일이 있는 경우
 				
 				// 유저 정보 가져오기
-				Map<String, Object> login = userService.login(vo);
+				Map<String, Object> user = userService.login(vo);
 				
 				// 비밀번호 일치 여부
-				Boolean result = egovPasswordEncoder.checkPassword(vo.getPassword(), (String) login.get("password"));
+				Boolean passwordCheck = egovPasswordEncoder.checkPassword(vo.getPassword(), (String) user.get("password"));
 				
-				if (result) {
+				if (passwordCheck) {
 					
 					// 비밀번호 일치할 경우
-					 Map<String, Object> getUser = new HashMap<>();
+					
+					// 토큰 생성
+					 String accessToken = jwtService.createJwt(vo);
 					 
-					 getUser.put("user", login);
+					response.put("accessToken", accessToken);
 					
-					System.out.println(getUser);
-					
-					return getUser;
+					return response;
 				} else {
 					
 					// 비밀번호 일치하지 않을 경우
-		            Map<String, Object> errorResponse = new HashMap<>();
-		            
 		            errorResponse.put("오류 발생", "비밀번호가 일치하지 않습니다.");
 		            
 		            return errorResponse;
-		            
 				}
-				
 			}
 			
 		} catch (Exception e) {
@@ -254,6 +203,21 @@ public class EgovSampleController {
             return errorResponse;
 		}
 
+	}
+	
+	// 유저 정보 가져오기
+	@RequestMapping(value = "/getUser", method = RequestMethod.POST, produces="application/json;charset=utf-8", consumes="application/json;charset=utf-8")
+	public Map<String, Object> getUser(@RequestBody TokenVO token) throws Exception {
+		
+		// 해시맵 선언
+		Map<String, Object> response = new HashMap<>();
+		
+		// 토큰으로 유저 정보 가져오기
+		Claims userInfo =  jwtService.getData(token.getToken());
+		
+		response.put("userInfo", userInfo);
+		
+		return response;
 	}
 	
     // 장바구니 목록 조회
