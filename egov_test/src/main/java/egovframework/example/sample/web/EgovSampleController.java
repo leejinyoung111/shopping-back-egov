@@ -223,8 +223,13 @@ public class EgovSampleController {
     // 장바구니 목록 조회
 	@RequestMapping(value = "/cart/{userId}", method = RequestMethod.GET, produces="application/json;charset=utf-8")
 	public Map<String, Object> cartList(@PathVariable("userId") int userId) throws Exception {
-		List<CartVO> getCartList = cartService.cartList(userId);
+		
+		// 해시맵 선언
 		Map<String, Object> response = new HashMap<>();
+		
+		// 목록 조회
+		List<CartVO> getCartList = cartService.cartList(userId);
+
 		response.put("getCartList", getCartList);
 	        
 		return response;
@@ -232,14 +237,36 @@ public class EgovSampleController {
 	
 	// 장바구니 추가 기능
 	@RequestMapping(value = "/addCart", method = RequestMethod.POST, produces="application/json;charset=utf-8", consumes="application/json;charset=utf-8")
-	public String insertCart(@RequestBody CartVO vo) throws Exception{
+	public Map<String, Object> insertCart(@RequestBody CartVO vo) throws Exception{
 		try {
-			cartService.insertCart(vo);
-			return "장바구니 추가 성공!";
+			
+			// 해시맵 선언
+			Map<String, Object> response = new HashMap<>();
+			
+			// 상품 체크
+			int isProduct = cartService.productCheck(vo);
+			
+			if (isProduct == 0) {
+				// 장바구니에 없는 경우
+				cartService.insertCart(vo);
+				response.put("message", "장바구니 추가 성공.");
+				
+				return response;
+			} else {
+				
+				// 장바구니에 있는 경우
+				response.put("message", "이미 추가한 상품입니다.");
+				
+				return response;
+			}
 			
 		} catch (Exception e) {
-			System.out.println("발생 오류:" + e);
-			return "발생 오류:" + e;
+            e.printStackTrace();
+            System.out.println("오류발생 :" + e);
+            
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", "오류가 발생했습니다.");
+            return errorResponse;
 		}
 	}
 

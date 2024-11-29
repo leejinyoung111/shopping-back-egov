@@ -27,6 +27,13 @@ public class CartServiceImpl extends EgovAbstractServiceImpl implements CartServ
 		return resultVO;
 	};
 	
+	// 상품 체크
+	@Override
+	public int productCheck(CartVO vo) throws Exception {
+		int resultVO = cartDAO.productCheck(vo);
+		return resultVO;
+	}
+	
 	// 장바구니 추가
 	@Override
 	public String insertCart(CartVO vo) throws Exception{

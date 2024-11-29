@@ -4,12 +4,12 @@ public class CartVO {
 	
 	private int id;
 	private int userId;
+	private String bookId;
 	private String title;
 	private int price;
 	private String thumbnail;
-	private String isbn;
 	private String publisher;
-	
+	private int count;
 	
 	public int getId() {
 		return id;
@@ -22,6 +22,12 @@ public class CartVO {
 	}
 	public void setUserId(int userId) {
 		this.userId = userId;
+	}
+	public String getBookId() {
+		return bookId;
+	}
+	public void setBookId(String bookId) {
+		this.bookId = bookId;
 	}
 	public String getTitle() {
 		return title;
@@ -41,17 +47,17 @@ public class CartVO {
 	public void setThumbnail(String thumbnail) {
 		this.thumbnail = thumbnail;
 	}
-	public String getIsbn() {
-		return isbn;
-	}
-	public void setIsbn(String isbn) {
-		this.isbn = isbn;
-	}
 	public String getPublisher() {
 		return publisher;
 	}
 	public void setPublisher(String publisher) {
 		this.publisher = publisher;
+	}
+	public int getCount() {
+		return count;
+	}
+	public void setCount(int count) {
+		this.count = count;
 	}
 	
 	
