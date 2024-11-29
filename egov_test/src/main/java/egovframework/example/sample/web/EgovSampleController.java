@@ -28,6 +28,9 @@ import egovframework.example.sample.service.TestService;
 import egovframework.example.sample.service.TestVO;
 import egovframework.example.sample.service.UserService;
 import egovframework.example.sample.service.UserVO;
+
+import org.egovframe.rte.fdl.cryptography.EgovEnvCryptoService;
+import org.egovframe.rte.fdl.cryptography.EgovPasswordEncoder;
 import org.egovframe.rte.fdl.property.EgovPropertyService;
 import org.egovframe.rte.ptl.mvc.tags.ui.pagination.PaginationInfo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,7 +87,6 @@ public class EgovSampleController {
 	 
 	@Autowired
 	
-	
 	@Resource(name = "userService")
 	private UserService userService;
 	
@@ -94,7 +96,7 @@ public class EgovSampleController {
 	@Resource(name = "testService")
 	private TestService testService;
 	
-
+	
 	
     // 메인 페이지
 	@RequestMapping(value = "/test", method = RequestMethod.GET, produces="application/json;charset=utf-8")
@@ -103,24 +105,54 @@ public class EgovSampleController {
 		
 	}
 	
-	// 비밀번호 테스트
+	// 비밀번호 암호화 테스트
 	@RequestMapping(value = "/insertUser", method = RequestMethod.POST, produces="application/json;charset=utf-8", consumes="application/json;charset=utf-8")
-	public void insertUser(@RequestBody TestVO vo) throws Exception{
-		
-		String password = vo.getPassword();
-		
-		System.out.println(password);
-
-		
-//		 ;
-//		try {
-//			testService.insertUser(vo);
-//			return "비밀번호 테스트중!";
-//			
-//		} catch (Exception e) {
-//			System.out.println("발생 오류:" + e);
-//			return "발생 오류:" + e;
-//		}
+	public String insertUser(@RequestBody TestVO vo) throws Exception{
+		try {
+			
+			// 인코더 선언
+			EgovPasswordEncoder egovPasswordEncoder = new EgovPasswordEncoder();
+			
+			// 비밀번호 암호화
+			String hashed = egovPasswordEncoder.encryptPassword(vo.getPassword());
+			
+			// 암호화된 비밀번호로 바꾸기
+			vo.setPassword(hashed);	
+			
+			testService.insertUser(vo);
+			
+			return "비밀번호 테스트중!";
+			
+		} catch (Exception e) {
+			System.out.println("발생 오류:" + e);
+			return "발생 오류:" + e;
+		}
+	}
+	
+	// 비밀번호 복호화 테스트
+	@RequestMapping(value = "/getUser", method = RequestMethod.POST, produces="application/json;charset=utf-8", consumes="application/json;charset=utf-8")
+	public String getUser(@RequestBody TestVO vo) throws Exception{
+		try {
+			
+			// 인코더 선언
+			EgovPasswordEncoder egovPasswordEncoder = new EgovPasswordEncoder();
+			
+			// 유저 정보 가져오기
+			Map<String, Object> getUser = testService.getUser(vo);
+			
+			// 비밀번호 일치 여부
+			Boolean result = egovPasswordEncoder.checkPassword(vo.getPassword(), (String) getUser.get("password"));
+			
+			if (result) {
+				return "로그인 성공!";
+			} else {
+				return "비밀번호가 다릅니다.";
+			}
+			
+		} catch (Exception e) {
+            e.printStackTrace();
+            return "오류 발생";
+		}
 	}
 	
 	
@@ -128,7 +160,18 @@ public class EgovSampleController {
 	@RequestMapping(value = "/register", method = RequestMethod.POST, produces="application/json;charset=utf-8", consumes="application/json;charset=utf-8")
 	public String register(@RequestBody UserVO vo) throws Exception{
 		try {
+			
+			// 인코더 선언
+			EgovPasswordEncoder egovPasswordEncoder = new EgovPasswordEncoder();
+			
+			// 비밀번호 암호화
+			String hashed = egovPasswordEncoder.encryptPassword(vo.getPassword());
+			
+			// 암호화된 비밀번호로 바꾸기
+			vo.setPassword(hashed);	
+			
 			userService.register(vo);
+			
 			return "회원가입 성공!";
 			
 		} catch (Exception e) {
@@ -141,13 +184,33 @@ public class EgovSampleController {
 	@RequestMapping(value = "/login", method = RequestMethod.POST, produces="application/json;charset=utf-8", consumes="application/json;charset=utf-8")
 	public Map<String, Object>  login(@RequestBody UserVO vo) {
 		try {
-			Map<String, Object> login = userService.login(vo);
+			
+			// 해시맵 선언
 			Map<String, Object> response = new HashMap<>();
 			
-			response.put("user", login);
+			// 인코더 선언
+			EgovPasswordEncoder egovPasswordEncoder = new EgovPasswordEncoder();
 			
-			System.out.println(response);
-			return response;
+			// 유저 정보 가져오기
+			Map<String, Object> login = userService.login(vo);
+			
+			// 비밀번호 일치 여부
+			Boolean result = egovPasswordEncoder.checkPassword(vo.getPassword(), (String) login.get("password"));
+			
+			if (result) {
+				
+				// 비밀번호 일치할 경우
+				response.put("user", login);
+				
+				System.out.println(response);
+				return response;
+			} else {
+				// 비밀번호 일치하지 않을 경우
+				response.put("error", "비밀번호가 일치하지 않습니다.");
+	            return response;
+			}
+			
+			
 			
 		} catch (Exception e) {
             e.printStackTrace();

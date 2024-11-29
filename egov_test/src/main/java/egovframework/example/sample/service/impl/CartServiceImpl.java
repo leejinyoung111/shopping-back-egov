@@ -1,6 +1,7 @@
 package egovframework.example.sample.service.impl;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -20,19 +21,24 @@ public class CartServiceImpl extends EgovAbstractServiceImpl implements CartServ
 	// 장바구니 조회
 	@Override
 	public List<CartVO> cartList(int userId) throws Exception{
-		return cartDAO.cartList(userId);
+		List<CartVO> resultVO = cartDAO.cartList(userId);
+		if (resultVO == null)
+			throw processException("info.nodata.msg");
+		return resultVO;
 	};
 	
-	@Override
 	// 장바구니 추가
+	@Override
 	public String insertCart(CartVO vo) throws Exception{
-		return cartDAO.insertCart(vo);
+		cartDAO.insertCart(vo);
+		return "장바구니 추가 성공!";
 	};
 	
-	@Override
 	// 장바구니 삭제
+	@Override
 	public String deleteCart(int id) throws Exception{
-		return cartDAO.deleteCart(id);
+		cartDAO.deleteCart(id);
+		return "장바구니 삭제 성공!";
 	};
 
 }

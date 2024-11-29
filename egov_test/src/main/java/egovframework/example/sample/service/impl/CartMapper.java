@@ -13,9 +13,9 @@ public interface CartMapper {
 	List<CartVO> cartList(int userId) throws Exception;
 	
 	// 장바구니 추가
-	String insertCart(CartVO vo) throws Exception;
+	void insertCart(CartVO vo) throws Exception;
 	
 	// 장바구니 삭제
-	String deleteCart(int id) throws Exception;
+	void deleteCart(int id) throws Exception;
 
 }

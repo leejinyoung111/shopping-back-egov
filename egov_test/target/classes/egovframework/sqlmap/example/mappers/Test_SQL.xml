@@ -9,11 +9,16 @@
 	</resultMap>
 	
 
-	<!-- 비밀번호 테스트 -->
+	<!-- 비밀번호 암호화 테스트 -->
 	<insert id="insertUser" parameterType="TestVO">
-		insert in to test_user (name, password)
-						values ( #{name}, #{password})
+		insert into test_user (name, password)
+					values ( #{name}, #{password})
 	</insert>
+	
+	<!-- 비밀번호 복호화 테스트 -->
+	<select id="getUser" resultType="HashMap">
+		select * from test_user where name=#{name}
+	</select>
 	
 	
 </mapper>

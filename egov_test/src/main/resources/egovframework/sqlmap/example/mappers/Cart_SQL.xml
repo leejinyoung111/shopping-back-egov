@@ -20,8 +20,8 @@
 	
 	<!-- 장바구니 추가 기능 -->
 	<insert id="insertCart" parameterType="CartVO">
-		insert in to user (userId, title, price, thumbnail, isbn, publisher)
-				values ( #{userId}, #{title}, #{price}, #{thumbnail}, #{isbn}, #{publisher})
+		insert into cart (userId, title, price, thumbnail, isbn, publisher)
+					values ( #{userId}, #{title}, #{price}, #{thumbnail}, #{isbn}, #{publisher})
 
 	</insert>
 	
