@@ -19,15 +19,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Resource;
-import egovframework.example.sample.service.BookService;
-import egovframework.example.sample.service.BookVO;
 import egovframework.example.sample.service.CartService;
 import egovframework.example.sample.service.CartVO;
 import egovframework.example.sample.service.EgovSampleService;
+import egovframework.example.sample.service.JwtService;
 import egovframework.example.sample.service.SampleDefaultVO;
 import egovframework.example.sample.service.SampleVO;
+import egovframework.example.sample.service.TestService;
+import egovframework.example.sample.service.TestVO;
+import egovframework.example.sample.service.TokenVO;
 import egovframework.example.sample.service.UserService;
 import egovframework.example.sample.service.UserVO;
+import io.jsonwebtoken.Claims;
+
+import org.egovframe.rte.fdl.cryptography.EgovPasswordEncoder;
 import org.egovframe.rte.fdl.property.EgovPropertyService;
 import org.egovframe.rte.ptl.mvc.tags.ui.pagination.PaginationInfo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +49,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springmodules.validation.commons.DefaultBeanValidator;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @Class Name : EgovSampleController.java
@@ -84,10 +88,6 @@ public class EgovSampleController {
 
 	 
 	@Autowired
-    
-	
-	@Resource(name = "bookService")
-	private BookService bookService;
 	
 	@Resource(name = "userService")
 	private UserService userService;
@@ -95,50 +95,108 @@ public class EgovSampleController {
 	@Resource(name = "cartService")
 	private CartService cartService;
 	
+	@Resource(name = "testService")
+	private TestService testService;
+	
+	@Resource(name = "jwtService")
+	private JwtService jwtService;
+	
 	
     // 메인 페이지
 	@RequestMapping(value = "/test", method = RequestMethod.GET, produces="application/json;charset=utf-8")
 	public String test() throws Exception {
-		List<BookVO> getBookList = bookService.bookList();
-		Map<String, Object> response = new HashMap<>();
-		response.put("getBookList", getBookList);
+		return "테스트 페이지";
 		
-		ObjectMapper objectMapper = new ObjectMapper();
-		String jsonString = objectMapper.writeValueAsString(response);
-		
-		System.out.println(jsonString);
-	        
-		return jsonString;
-	}
+	} 
 	
 	// 회원가입 기능
 	@RequestMapping(value = "/register", method = RequestMethod.POST, produces="application/json;charset=utf-8", consumes="application/json;charset=utf-8")
-	public String register(@RequestBody UserVO vo) throws Exception{
+	public String register(@RequestBody UserVO vo) throws Exception {
 		try {
-			userService.register(vo);
-			return "회원가입 성공!";
+			
+			// 인코더 선언
+			EgovPasswordEncoder egovPasswordEncoder = new EgovPasswordEncoder();
+			
+			// 비밀번호 암호화
+			String hashed = egovPasswordEncoder.encryptPassword(vo.getPassword());
+			
+			// 이메일 체크
+			int isEmail = userService.emailCheck(vo.getEmail());
+			
+			if (isEmail == 0) {
+				// 일치하는 이메일이 없는 경우
+				
+				// 암호화된 비밀번호로 바꾸기
+				vo.setPassword(hashed);
+				
+				// 회원가입
+				userService.register(vo);
+				
+				return "회원가입 성공!";
+				
+			
+			} else {
+				// 일치하는 이메일이 있는 경우
+				return "존재하는 이메일입니다.";
+			}
 			
 		} catch (Exception e) {
-			System.out.println("발생 오류:" + e);
-			return "발생 오류:" + e;
+			System.out.println("오류 발생:" + e);
+			return "오류 발생:" + e;
 		}
 	}
 	
 	// 로그인 기능
 	@RequestMapping(value = "/login", method = RequestMethod.POST, produces="application/json;charset=utf-8", consumes="application/json;charset=utf-8")
-	public Map<String, Object>  login(@RequestBody UserVO vo) {
+	public Map<String, Object>  login(@RequestBody UserVO vo) throws Exception {
 		try {
-			Map<String, Object> login = userService.login(vo);
+			
+			// 인코더 선언
+			EgovPasswordEncoder egovPasswordEncoder = new EgovPasswordEncoder();
+			
+			// 해시맵 선언
 			Map<String, Object> response = new HashMap<>();
+			Map<String, Object> errorResponse = new HashMap<>();
 			
-			response.put("user", login);
+			// 이메일 체크
+			int isEmail = userService.emailCheck(vo.getEmail());
 			
-			System.out.println(response);
-			return response;
+			if (isEmail == 0) {
+				// 일치하는 이메일이 없는 경우
+	            errorResponse.put("오류 발생", "일치하는 이메일이 없습니다.");
+	            return errorResponse;
+
+			} else {
+				// 일치하는 이메일이 있는 경우
+				
+				// 유저 정보 가져오기
+				Map<String, Object> user = userService.login(vo);
+				
+				// 비밀번호 일치 여부
+				Boolean passwordCheck = egovPasswordEncoder.checkPassword(vo.getPassword(), (String) user.get("password"));
+				
+				if (passwordCheck) {
+					
+					// 비밀번호 일치할 경우
+					
+					// 토큰 생성
+					 String accessToken = jwtService.createJwt(vo);
+					 
+					response.put("accessToken", accessToken);
+					
+					return response;
+				} else {
+					
+					// 비밀번호 일치하지 않을 경우
+		            errorResponse.put("오류 발생", "비밀번호가 일치하지 않습니다.");
+		            
+		            return errorResponse;
+				}
+			}
 			
 		} catch (Exception e) {
             e.printStackTrace();
-            System.out.println("발생 오류:" + e);
+            System.out.println("오류발생 :" + e);
             
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("error", "유저정보를 가져오는 중 오류가 발생했습니다.");
@@ -147,11 +205,31 @@ public class EgovSampleController {
 
 	}
 	
+	// 유저 정보 가져오기
+	@RequestMapping(value = "/getUser", method = RequestMethod.POST, produces="application/json;charset=utf-8", consumes="application/json;charset=utf-8")
+	public Map<String, Object> getUser(@RequestBody TokenVO token) throws Exception {
+		
+		// 해시맵 선언
+		Map<String, Object> response = new HashMap<>();
+		
+		// 토큰으로 유저 정보 가져오기
+		Claims userInfo =  jwtService.getData(token.getToken());
+		
+		response.put("userInfo", userInfo);
+		
+		return response;
+	}
+	
     // 장바구니 목록 조회
 	@RequestMapping(value = "/cart/{userId}", method = RequestMethod.GET, produces="application/json;charset=utf-8")
 	public Map<String, Object> cartList(@PathVariable("userId") int userId) throws Exception {
-		List<CartVO> getCartList = cartService.cartList(userId);
+		
+		// 해시맵 선언
 		Map<String, Object> response = new HashMap<>();
+		
+		// 목록 조회
+		List<CartVO> getCartList = cartService.cartList(userId);
+
 		response.put("getCartList", getCartList);
 	        
 		return response;
@@ -159,14 +237,36 @@ public class EgovSampleController {
 	
 	// 장바구니 추가 기능
 	@RequestMapping(value = "/addCart", method = RequestMethod.POST, produces="application/json;charset=utf-8", consumes="application/json;charset=utf-8")
-	public String insertCart(@RequestBody CartVO vo) throws Exception{
+	public Map<String, Object> insertCart(@RequestBody CartVO vo) throws Exception{
 		try {
-			cartService.insertCart(vo);
-			return "장바구니 추가 성공!";
+			
+			// 해시맵 선언
+			Map<String, Object> response = new HashMap<>();
+			
+			// 상품 체크
+			int isProduct = cartService.productCheck(vo);
+			
+			if (isProduct == 0) {
+				// 장바구니에 없는 경우
+				cartService.insertCart(vo);
+				response.put("message", "장바구니 추가 성공.");
+				
+				return response;
+			} else {
+				
+				// 장바구니에 있는 경우
+				response.put("message", "이미 추가한 상품입니다.");
+				
+				return response;
+			}
 			
 		} catch (Exception e) {
-			System.out.println("발생 오류:" + e);
-			return "발생 오류:" + e;
+            e.printStackTrace();
+            System.out.println("오류발생 :" + e);
+            
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", "오류가 발생했습니다.");
+            return errorResponse;
 		}
 	}
 

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="egovframework.example.sample.service.impl.UserMapper">
+
+	<resultMap id="user" type="egovframework.example.sample.service.UserVO">
+		<id property="id" column="id"/>
+		<result property="email" column="email"/>
+		<result property="name" column="name"/>
+		<result property="password" column="password"/>
+		<result property="postCode" column="postCode"/>
+		<result property="address" column="address"/>
+		<result property="detailAddress" column="detailAddress"/>
+	</resultMap>
+
+	<!-- 이메일 체크 -->
+	<select id="emailCheck" resultType="int">
+		select count(*) from user where email=#{email}
+	</select>
+	
+	<!-- 회원가입 -->
+	<insert id="register" parameterType="UserVO">
+	insert into user (email, name, password, postCode, address, detailAddress)
+				values (#{email}, #{name}, #{password}, #{postCode}, #{address}, #{detailAddress})
+
+	</insert>
+	
+	<!-- 로그인 -->
+	<select id="login" resultType="HashMap">
+		select * from user where email=#{email}
+	</select>
+</mapper>
