@@ -158,7 +158,7 @@ public class EgovSampleController {
 	
 	// 회원가입 기능
 	@RequestMapping(value = "/register", method = RequestMethod.POST, produces="application/json;charset=utf-8", consumes="application/json;charset=utf-8")
-	public String register(@RequestBody UserVO vo) throws Exception{
+	public String register(@RequestBody UserVO vo) {
 		try {
 			
 			// 인코더 선언
@@ -167,16 +167,28 @@ public class EgovSampleController {
 			// 비밀번호 암호화
 			String hashed = egovPasswordEncoder.encryptPassword(vo.getPassword());
 			
-			// 암호화된 비밀번호로 바꾸기
-			vo.setPassword(hashed);	
+			// 이메일 체크
+			int isEmail = userService.emailCheck(vo.getEmail());
 			
-			userService.register(vo);
-			
-			return "회원가입 성공!";
+			if (isEmail == 0) {
+				// 일치하는 이메일이 없는 경우
+				
+				// 암호화된 비밀번호로 바꾸기
+				vo.setPassword(hashed);
+				
+				userService.register(vo);
+				
+				return "회원가입 성공!";
+			} else {
+				// 일치하는 이메일이 있는 경우
+				
+				System.out.println("존재하는 이메일입니다.");
+				return "존재하는 이메일입니다.";
+			}
 			
 		} catch (Exception e) {
-			System.out.println("발생 오류:" + e);
-			return "발생 오류:" + e;
+			System.out.println("오류 발생:" + e);
+			return "오류 발생:" + e;
 		}
 	}
 	
@@ -191,30 +203,51 @@ public class EgovSampleController {
 			// 인코더 선언
 			EgovPasswordEncoder egovPasswordEncoder = new EgovPasswordEncoder();
 			
-			// 유저 정보 가져오기
-			Map<String, Object> login = userService.login(vo);
+			// 이메일 체크
+			int isEmail = userService.emailCheck(vo.getEmail());
 			
-			// 비밀번호 일치 여부
-			Boolean result = egovPasswordEncoder.checkPassword(vo.getPassword(), (String) login.get("password"));
-			
-			if (result) {
-				
-				// 비밀번호 일치할 경우
-				response.put("user", login);
-				
-				System.out.println(response);
-				return response;
+			if (isEmail == 0) {
+				// 일치하는 이메일이 없는 경우
+	            Map<String, Object> errorResponse = new HashMap<>();
+	            errorResponse.put("오류 발생", "일치하는 이메일이 없습니다.");
+	            
+	            return errorResponse;
+
 			} else {
-				// 비밀번호 일치하지 않을 경우
-				response.put("error", "비밀번호가 일치하지 않습니다.");
-	            return response;
+				// 일치하는 이메일이 있는 경우
+				
+				// 유저 정보 가져오기
+				Map<String, Object> login = userService.login(vo);
+				
+				// 비밀번호 일치 여부
+				Boolean result = egovPasswordEncoder.checkPassword(vo.getPassword(), (String) login.get("password"));
+				
+				if (result) {
+					
+					// 비밀번호 일치할 경우
+					 Map<String, Object> getUser = new HashMap<>();
+					 
+					 getUser.put("user", login);
+					
+					System.out.println(getUser);
+					
+					return getUser;
+				} else {
+					
+					// 비밀번호 일치하지 않을 경우
+		            Map<String, Object> errorResponse = new HashMap<>();
+		            
+		            errorResponse.put("오류 발생", "비밀번호가 일치하지 않습니다.");
+		            
+		            return errorResponse;
+		            
+				}
+				
 			}
-			
-			
 			
 		} catch (Exception e) {
             e.printStackTrace();
-            System.out.println("발생 오류:" + e);
+            System.out.println("오류발생 :" + e);
             
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("error", "유저정보를 가져오는 중 오류가 발생했습니다.");

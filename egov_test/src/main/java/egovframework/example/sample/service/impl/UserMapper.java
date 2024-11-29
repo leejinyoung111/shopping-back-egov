@@ -9,6 +9,9 @@ import egovframework.example.sample.service.UserVO;
 @Mapper("userMapper")
 public interface UserMapper {
 	
+	// 이메일 체크
+	int emailCheck(String email) throws Exception;
+	
 	// 회원가입
 	void register(UserVO vo) throws Exception;
 	

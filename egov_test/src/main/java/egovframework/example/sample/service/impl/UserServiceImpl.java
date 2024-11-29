@@ -15,6 +15,15 @@ public class UserServiceImpl extends EgovAbstractServiceImpl implements UserServ
 	@Resource(name="userMapper")
 	private UserMapper userDAO;
 	
+	// 이메일 체크
+	@Override
+	public int emailCheck(String email) throws Exception {
+		int resultVO = userDAO.emailCheck(email);
+//		if (resultVO == null)
+//			throw processException("info.nodata.msg");
+		return resultVO;
+	}
+	
 	// 회원가입
 	@Override
 	public String register(UserVO vo) throws Exception {

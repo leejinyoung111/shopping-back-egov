@@ -11,6 +11,11 @@
 		<result property="address" column="address"/>
 		<result property="detailAddress" column="detailAddress"/>
 	</resultMap>
+
+	<!-- 이메일 체크 -->
+	<select id="emailCheck" resultType="int">
+		select count(*) from user where email=#{email}
+	</select>
 	
 	<!-- 회원가입 -->
 	<insert id="register" parameterType="UserVO">
