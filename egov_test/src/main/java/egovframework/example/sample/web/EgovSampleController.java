@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 
 import egovframework.example.sample.service.CartService;
 import egovframework.example.sample.service.CartUpdateVO;
