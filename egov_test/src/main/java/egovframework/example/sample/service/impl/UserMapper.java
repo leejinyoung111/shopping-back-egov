@@ -3,7 +3,6 @@ package egovframework.example.sample.service.impl;
 import java.util.Map;
 
 import org.egovframe.rte.psl.dataaccess.mapper.Mapper;
-
 import egovframework.example.sample.service.UserVO;
 
 @Mapper("userMapper")
@@ -17,5 +16,8 @@ public interface UserMapper {
 	
 	// 로그인
 	Map<String, Object> login(UserVO vo) throws Exception;
+	
+	// 유저 정보 수정
+	void updateUser(UserVO vo) throws Exception;
 
 }

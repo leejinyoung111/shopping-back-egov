@@ -37,4 +37,11 @@ public class UserServiceImpl extends EgovAbstractServiceImpl implements UserServ
 			throw processException("info.nodata.msg");
 		return resultVO;
 	}
+	
+	// 유저 정보 수정
+	@Override
+	public void updateUser(UserVO vo) throws Exception {
+		userDAO.updateUser(vo);
+	}
+	
 }

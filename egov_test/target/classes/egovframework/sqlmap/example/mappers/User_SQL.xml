@@ -28,4 +28,19 @@
 	<select id="login" resultType="HashMap">
 		select * from user where email=#{email}
 	</select>
+
+	<!-- 유저 정보 수정 -->
+	<update id="updateUser" >
+		update user set email=#{email},
+						name=#{name},
+						password=#{password},
+						postCode=#{postCode},
+						address=#{address},
+						detailAddress=#{detailAddress}
+					where id=#{id}
+	</update>
+	
+	
+	
+	
 </mapper>

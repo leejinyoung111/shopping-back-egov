@@ -13,4 +13,7 @@ public interface UserService {
 	// 로그인
 	Map<String, Object> login(UserVO vo) throws Exception;
 	
+	// 유저 정보 수정
+	void updateUser(UserVO vo) throws Exception;
+	
 }

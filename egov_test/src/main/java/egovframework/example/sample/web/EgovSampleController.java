@@ -25,8 +25,6 @@ import egovframework.example.sample.service.EgovSampleService;
 import egovframework.example.sample.service.JwtService;
 import egovframework.example.sample.service.SampleDefaultVO;
 import egovframework.example.sample.service.SampleVO;
-import egovframework.example.sample.service.TestService;
-import egovframework.example.sample.service.TestVO;
 import egovframework.example.sample.service.TokenVO;
 import egovframework.example.sample.service.UserService;
 import egovframework.example.sample.service.UserVO;
@@ -95,21 +93,18 @@ public class EgovSampleController {
 	@Resource(name = "cartService")
 	private CartService cartService;
 	
-	@Resource(name = "testService")
-	private TestService testService;
-	
 	@Resource(name = "jwtService")
 	private JwtService jwtService;
 	
 	
-    // 메인 페이지
+    // 테스트 페이지
 	@RequestMapping(value = "/test", method = RequestMethod.GET, produces="application/json;charset=utf-8")
 	public String test() throws Exception {
 		return "테스트 페이지";
 		
 	} 
 	
-	// 회원가입 기능
+	// 회원가입
 	@RequestMapping(value = "/register", method = RequestMethod.POST, produces="application/json;charset=utf-8", consumes="application/json;charset=utf-8")
 	public String register(@RequestBody UserVO vo) throws Exception {
 		try {
@@ -146,9 +141,9 @@ public class EgovSampleController {
 		}
 	}
 	
-	// 로그인 기능
+	// 로그인
 	@RequestMapping(value = "/login", method = RequestMethod.POST, produces="application/json;charset=utf-8", consumes="application/json;charset=utf-8")
-	public Map<String, Object>  login(@RequestBody UserVO vo) throws Exception {
+	public Map<String, Object> login(@RequestBody UserVO vo) throws Exception {
 		try {
 			
 			// 인코더 선언
@@ -220,6 +215,43 @@ public class EgovSampleController {
 		return response;
 	}
 	
+	// 유저정보 수정
+	@RequestMapping(value = "/updateUser", method = RequestMethod.PATCH, produces="application/json;charset=utf-8", consumes="application/json;charset=utf-8")
+	public Map<String, Object> updateUser(@RequestBody UserVO vo) throws Exception{
+		try {
+			
+			// 해시맵 선언
+			Map<String, Object> response = new HashMap<>();
+			
+			// 인코더 선언
+			EgovPasswordEncoder egovPasswordEncoder = new EgovPasswordEncoder();
+			
+			// 비밀번호 암호화
+			String hashed = egovPasswordEncoder.encryptPassword(vo.getPassword());
+			
+			// 암호화된 비밀번호로 바꾸기
+			vo.setPassword(hashed);
+			
+			// 정보 수정
+			userService.updateUser(vo);
+			
+			// 새로운 토큰 발급
+			String accessToken = jwtService.createJwt(vo);
+		 
+			response.put("accessToken", accessToken);
+
+			return response;
+
+			
+		} catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("오류발생 :" + e);
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", "정보 수정을 하는 중 오류가 발생했습니다.");
+            return errorResponse;
+		}
+	}
+	
     // 장바구니 목록 조회
 	@RequestMapping(value = "/cart/{userId}", method = RequestMethod.GET, produces="application/json;charset=utf-8")
 	public Map<String, Object> cartList(@PathVariable("userId") int userId) throws Exception {
@@ -235,7 +267,7 @@ public class EgovSampleController {
 		return response;
 	}
 	
-	// 장바구니 추가 기능
+	// 장바구니 추가
 	@RequestMapping(value = "/addCart", method = RequestMethod.POST, produces="application/json;charset=utf-8", consumes="application/json;charset=utf-8")
 	public Map<String, Object> insertCart(@RequestBody CartVO vo) throws Exception{
 		try {
@@ -270,7 +302,7 @@ public class EgovSampleController {
 		}
 	}
 
-    // 장바구니 삭제 기능
+    // 장바구니 삭제
 	@RequestMapping(value = "/cart/{id}", method = RequestMethod.DELETE, produces="application/json;charset=utf-8")
 	public String deleteCart(@PathVariable("id") int id) throws Exception {
 		
