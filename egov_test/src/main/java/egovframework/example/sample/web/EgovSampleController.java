@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import javax.annotation.Resource;
 
+
 import egovframework.example.sample.service.CartService;
 import egovframework.example.sample.service.CartUpdateVO;
 import egovframework.example.sample.service.CartVO;
@@ -196,7 +197,7 @@ public class EgovSampleController {
             System.out.println("오류발생 :" + e);
             
             Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("error", "유저정보를 가져오는 중 오류가 발생했습니다.");
+            errorResponse.put("error", "유저정보 확인 중 오류가 발생했습니다.");
             return errorResponse;
 		}
 
@@ -205,16 +206,27 @@ public class EgovSampleController {
 	// 유저 정보 가져오기
 	@RequestMapping(value = "/getUser", method = RequestMethod.POST, produces="application/json;charset=utf-8", consumes="application/json;charset=utf-8")
 	public Map<String, Object> getUser(@RequestBody TokenVO token) throws Exception {
-		
-		// 해시맵 선언
-		Map<String, Object> response = new HashMap<>();
-		
-		// 토큰으로 유저 정보 가져오기
-		Claims userInfo =  jwtService.getData(token.getToken());
-		
-		response.put("userInfo", userInfo);
-		
-		return response;
+		try {
+			
+			// 해시맵 선언
+			Map<String, Object> response = new HashMap<>();
+			
+			// 토큰으로 유저 정보 가져오기
+			Claims userInfo =  jwtService.getData(token.getToken());
+			
+			response.put("userInfo", userInfo);
+			
+			return response;
+
+		} catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("오류발생 :" + e);
+            
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", "유저정보를 가져오는 중 오류가 발생했습니다.");
+            return errorResponse;
+		}
+
 	}
 	
 	// 유저정보 변경
@@ -257,16 +269,26 @@ public class EgovSampleController {
     // 장바구니 목록 조회
 	@RequestMapping(value = "/cart/{userId}", method = RequestMethod.GET, produces="application/json;charset=utf-8")
 	public Map<String, Object> cartList(@PathVariable("userId") int userId) throws Exception {
+		try {
 		
-		// 해시맵 선언
-		Map<String, Object> response = new HashMap<>();
-		
-		// 목록 조회
-		List<CartVO> getCartList = cartService.cartList(userId);
+			// 해시맵 선언
+			Map<String, Object> response = new HashMap<>();
+			
+			// 목록 조회
+			List<CartVO> getCartList = cartService.cartList(userId);
 
-		response.put("getCartList", getCartList);
-	        
-		return response;
+			response.put("getCartList", getCartList);
+		        
+			return response;
+			
+		} catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("오류발생 :" + e);
+            
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", "장바구니 목록 조회 중 오류가 발생했습니다.");
+            return errorResponse;
+		}
 	}
 	
 	// 장바구니 추가
@@ -299,12 +321,11 @@ public class EgovSampleController {
             System.out.println("오류발생 :" + e);
             
             Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("error", "오류가 발생했습니다.");
+            errorResponse.put("error", "장바구니 추가 중 오류가 발생했습니다.");
             return errorResponse;
 		}
 	}
 
-	
 	// 상품 수량 변경
 	@RequestMapping(value = "/updateProductCount", method = RequestMethod.PATCH, produces="application/json;charset=utf-8", consumes="application/json;charset=utf-8")
 	public Map<String, Object> updateProductCount(@RequestBody CartUpdateVO vo) throws Exception {
@@ -326,7 +347,7 @@ public class EgovSampleController {
             System.out.println("오류발생 :" + e);
             
             Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("error", "오류가 발생했습니다.");
+            errorResponse.put("error", "상품 수량 변경 중 오류가 발생했습니다.");
             return errorResponse;
 		}
 	}
