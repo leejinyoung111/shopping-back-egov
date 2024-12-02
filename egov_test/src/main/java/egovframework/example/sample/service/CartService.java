@@ -1,6 +1,7 @@
 package egovframework.example.sample.service;
 
 import java.util.List;
+import java.util.Map;
 
 public interface CartService {
 	
@@ -15,6 +16,9 @@ public interface CartService {
 	
 	// 장바구니 삭제
 	String deleteCart(int id) throws Exception;
+	
+	// 상품 수량 변경
+	void updateProductCount(CartUpdateVO vo) throws Exception;
 	
 
 }

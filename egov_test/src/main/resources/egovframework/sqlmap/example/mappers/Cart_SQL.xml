@@ -23,18 +23,22 @@
 		select count(*) from cart where userId=#{userId} and bookId=#{bookId}
 	</select>
 	
-	
-	<!-- 장바구니 추가 기능 -->
+	<!-- 장바구니 추가 -->
 	<insert id="insertCart" parameterType="CartVO">
 		insert into cart (userId, bookId, title, price, thumbnail, publisher, count)
 				values ( #{userId}, #{bookId}, #{title}, #{price}, #{thumbnail}, #{publisher}, #{count})
 
 	</insert>
 	
-	<!-- 장바구니 삭제 기능 -->
+	<!-- 장바구니 삭제 -->
 	<delete id="deleteCart">
 		delete from cart where id=#{id}
 	</delete>
+	
+	<!-- 상품 수량 변경 -->
+	<update id="updateProductCount" >
+		update cart set count=#{count} where id=#{id}
+	</update>
 	
 	
 </mapper>
