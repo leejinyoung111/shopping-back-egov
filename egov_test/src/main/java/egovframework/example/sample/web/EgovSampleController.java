@@ -274,7 +274,7 @@ public class EgovSampleController {
 			// 토큰으로 유저 정보 가져오기
 			Claims userInfo = jwtService.getData(token.getToken());
 			
-			 SuccessCode successCode = SuccessCode.GETUSER;
+			 SuccessCode successCode = SuccessCode.GET_USER;
 			 testHashMap.put("userInfo", userInfo);
 			 
 			 Map<String, Object> result =  resultService.successResult(successCode, testHashMap);
@@ -324,11 +324,10 @@ public class EgovSampleController {
 					// 회원가입
 					userService.register(vo);
 					
-					
 					// 결과 전달
 		        	SuccessCode successCode = SuccessCode.REGISTER;
 		        	dataHashMap.put("data", "회원가입 성공");
-		        	Map<String, Object> result =  resultService.successResult(successCode, dataHashMap);
+		        	Map<String, Object> result = resultService.successResult(successCode, dataHashMap);
 		        	
 		            return result;
 	        		
@@ -338,7 +337,7 @@ public class EgovSampleController {
 					// 결과 전달
 		        	ErrorCode errorCode = ErrorCode.PASSWORD_LENGTH;
 		        	dataHashMap.put("data", "비밀번호 길이 오류");
-		        	Map<String, Object> result =  resultService.errorResult(errorCode, dataHashMap);
+		        	Map<String, Object> result = resultService.errorResult(errorCode, dataHashMap);
 
 			        return result;
 	        	}
@@ -349,7 +348,7 @@ public class EgovSampleController {
 				// 결과 전달
 	        	ErrorCode errorCode = ErrorCode.DUPLICATE_EMAIL;
 	        	dataHashMap.put("data", "이메일이 존재함");
-	        	Map<String, Object> result =  resultService.errorResult(errorCode, dataHashMap);
+	        	Map<String, Object> result = resultService.errorResult(errorCode, dataHashMap);
 
 		        return result;
 			}
@@ -383,7 +382,7 @@ public class EgovSampleController {
 				// 결과 전달
 	        	ErrorCode errorCode = ErrorCode.EMAIL_NOT_FOUND;
 	        	dataHashMap.put("data", "일치하는 이메일 없음");
-	        	Map<String, Object> result =  resultService.errorResult(errorCode, dataHashMap);
+	        	Map<String, Object> result = resultService.errorResult(errorCode, dataHashMap);
 	        	
 	            return result;
 
@@ -404,7 +403,7 @@ public class EgovSampleController {
 					// 결과 전달
 					SuccessCode successCode = SuccessCode.LOGIN;
 					dataHashMap.put("accessToken", accessToken);
-					Map<String, Object> result =  resultService.successResult(successCode, dataHashMap);
+					Map<String, Object> result = resultService.successResult(successCode, dataHashMap);
 					 
 					 return result;
 				} else {
@@ -412,8 +411,8 @@ public class EgovSampleController {
 					
 					// 결과 전달
 		        	ErrorCode errorCode = ErrorCode.PASSWORD_NOT_COMPARE;
-		        	dataHashMap.put("test", "비밀번호 다름");
-		        	Map<String, Object> result =  resultService.errorResult(errorCode, dataHashMap);
+		        	dataHashMap.put("data", "비밀번호 다름");
+		        	Map<String, Object> result = resultService.errorResult(errorCode, dataHashMap);
 		        	
 		            return result;
 				}
@@ -440,9 +439,9 @@ public class EgovSampleController {
 			Claims userInfo =  jwtService.getData(token.getToken());
 			
 			// 결과 전달
-			SuccessCode successCode = SuccessCode.GETUSER;
+			SuccessCode successCode = SuccessCode.GET_USER;
 			dataHashMap.put("userInfo", userInfo);
-			Map<String, Object> result =  resultService.successResult(successCode, dataHashMap);
+			Map<String, Object> result = resultService.successResult(successCode, dataHashMap);
 			 
 			return result;
 
@@ -497,24 +496,26 @@ public class EgovSampleController {
 	@RequestMapping(value = "/cart/{userId}", method = RequestMethod.GET, produces="application/json;charset=utf-8")
 	public Map<String, Object> cartList(@PathVariable("userId") int userId) throws Exception {
 		try {
-		
-			// 해시맵 선언
-			Map<String, Object> response = new HashMap<>();
 			
-			// 목록 조회
+			// 해시맵 선언
+			Map<String, Object> dataHashMap = new HashMap<>();
+			
+			// 장바구니 목록 가져오기
 			List<CartVO> getCartList = cartService.cartList(userId);
-
-			response.put("getCartList", getCartList);
-		        
-			return response;
+			
+			// 결과 전달
+			SuccessCode successCode = SuccessCode.GET_CART_LIST;
+			dataHashMap.put("getCartList", getCartList);
+			Map<String, Object> result = resultService.successResult(successCode, dataHashMap);
+			
+			return result;
 			
 		} catch (Exception e) {
             e.printStackTrace();
             System.out.println("오류발생 :" + e);
-            
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("error", "장바구니 목록 조회 중 오류가 발생했습니다.");
-            return errorResponse;
+            Map<String, Object> errorHashMap = new HashMap<>();
+            errorHashMap.put("error", "오류가 발생했습니다.");
+            return errorHashMap;
 		}
 	}
 	
@@ -524,32 +525,40 @@ public class EgovSampleController {
 		try {
 			
 			// 해시맵 선언
-			Map<String, Object> response = new HashMap<>();
+			Map<String, Object> dataHashMap = new HashMap<>();
 			
 			// 상품 체크
 			int isProduct = cartService.productCheck(vo);
 			
 			if (isProduct == 0) {
 				// 장바구니에 없는 경우
+				
+				// 장바구니 추가
 				cartService.insertCart(vo);
-				response.put("message", "장바구니 추가 성공.");
 				
-				return response;
+				// 결과 전달
+				SuccessCode successCode = SuccessCode.ADD_CART;
+				dataHashMap.put("data", "장바구니 추가 성공");
+				Map<String, Object> result = resultService.successResult(successCode, dataHashMap);
+				 
+				 return result;
 			} else {
-				
 				// 장바구니에 있는 경우
-				response.put("message", "이미 추가한 상품입니다.");
 				
-				return response;
+				// 결과 전달
+	        	ErrorCode errorCode = ErrorCode.DUPLICATE_PRODUCT;
+	        	dataHashMap.put("data", "일치하는 상품 있음");
+	        	Map<String, Object> result = resultService.errorResult(errorCode, dataHashMap);
+	        	
+	            return result;
 			}
 			
 		} catch (Exception e) {
             e.printStackTrace();
             System.out.println("오류발생 :" + e);
-            
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("error", "장바구니 추가 중 오류가 발생했습니다.");
-            return errorResponse;
+            Map<String, Object> errorHashMap = new HashMap<>();
+            errorHashMap.put("error", "오류가 발생했습니다.");
+            return errorHashMap;
 		}
 	}
 
@@ -559,37 +568,50 @@ public class EgovSampleController {
 		
 		try {
 			// 해시맵 선언
-			Map<String, Object> response = new HashMap<>();
+			Map<String, Object> dataHashMap = new HashMap<>();
 			
-			// 정보 변경
+			// 수량 변경
 			cartService.updateProductCount(vo);
 			
-			response.put("success", "변경 성공!");
-
-			return response;
-			
+			// 결과 전달
+			SuccessCode successCode = SuccessCode.PATCH_COUNT;
+			dataHashMap.put("data", "상품 수량 변경 성공");
+			Map<String, Object> result = resultService.successResult(successCode, dataHashMap);
+			 
+			 return result;
 			
 		} catch (Exception e) {
             e.printStackTrace();
             System.out.println("오류발생 :" + e);
-            
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("error", "상품 수량 변경 중 오류가 발생했습니다.");
-            return errorResponse;
+            Map<String, Object> errorHashMap = new HashMap<>();
+            errorHashMap.put("error", "오류가 발생했습니다.");
+            return errorHashMap;
 		}
 	}
 
     // 장바구니 삭제
 	@RequestMapping(value = "/cart/{id}", method = RequestMethod.DELETE, produces="application/json;charset=utf-8")
-	public String deleteCart(@PathVariable("id") int id) throws Exception {
-		
+	public Map<String, Object> deleteCart(@PathVariable("id") int id) throws Exception {
 		try {
+			// 해시맵 선언
+			Map<String, Object> dataHashMap = new HashMap<>();
+			
+			// 장바구니 삭제
 			cartService.deleteCart(id);
-			return "장바구니 삭제 성공!";
+			
+			// 결과 전달
+			SuccessCode successCode = SuccessCode.DELETE_PRODUCT;
+			dataHashMap.put("data", "장바구니 삭제 성공");
+			Map<String, Object> result = resultService.successResult(successCode, dataHashMap);
+			
+			return result;
 			
 		} catch (Exception e) {
-			System.out.println("발생 오류:" + e);
-			return "발생 오류:" + e;
+            e.printStackTrace();
+            System.out.println("오류발생 :" + e);
+            Map<String, Object> errorHashMap = new HashMap<>();
+            errorHashMap.put("error", "오류가 발생했습니다.");
+            return errorHashMap;
 		}
 
 	}
