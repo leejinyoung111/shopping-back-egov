@@ -126,7 +126,6 @@ public class EgovSampleController {
 	// 회원가입 에러처리 테스트
 	@RequestMapping(value = "/errorInsertMember", method = RequestMethod.POST, produces="application/json;charset=utf-8", consumes="application/json;charset=utf-8")
 	public Map<String, Object> errorInsertMember(@RequestBody MemberVO vo) throws Exception {
-
 		try {
 			
 			// 해시맵 선언
@@ -461,7 +460,7 @@ public class EgovSampleController {
 		try {
 			
 			// 해시맵 선언
-			Map<String, Object> response = new HashMap<>();
+			Map<String, Object> dataHashMap = new HashMap<>();
 			
 			// 인코더 선언
 			EgovPasswordEncoder egovPasswordEncoder = new EgovPasswordEncoder();
@@ -476,19 +475,21 @@ public class EgovSampleController {
 			userService.updateUser(vo);
 			
 			// 새로운 토큰 발급
-			String accessToken = jwtService.createJwt(vo);
-		 
-			response.put("accessToken", accessToken);
-
-			return response;
-
+			String accessToken =  jwtService.createJwt(vo);
+			
+			// 결과 전달
+			SuccessCode successCode = SuccessCode.PATCH_USER_INFO;
+			dataHashMap.put("accessToken", accessToken);
+			Map<String, Object> result = resultService.successResult(successCode, dataHashMap);
+			
+			return result;
 			
 		} catch (Exception e) {
             e.printStackTrace();
             System.out.println("오류발생 :" + e);
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("error", "정보 수정을 하는 중 오류가 발생했습니다.");
-            return errorResponse;
+            Map<String, Object> errorHashMap = new HashMap<>();
+            errorHashMap.put("error", "오류가 발생했습니다.");
+            return errorHashMap;
 		}
 	}
 	
