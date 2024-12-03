@@ -197,7 +197,6 @@ public class EgovSampleController {
 		}
 	}
 	
-	
 	// 로그인 에러처리 테스트
 	@RequestMapping(value = "/loginMember", method = RequestMethod.POST, produces="application/json;charset=utf-8", consumes="application/json;charset=utf-8")
 	public Map<String, Object> errorLoginMember(@RequestBody MemberVO vo) throws Exception {
@@ -295,38 +294,71 @@ public class EgovSampleController {
 	
 	// 회원가입
 	@RequestMapping(value = "/register", method = RequestMethod.POST, produces="application/json;charset=utf-8", consumes="application/json;charset=utf-8")
-	public String register(@RequestBody UserVO vo) throws Exception {
+	public Map<String, Object> register(@RequestBody UserVO vo) throws Exception {
 		try {
+			
+			// 해시맵 선언
+			Map<String, Object> dataHashMap = new HashMap<>();
 			
 			// 인코더 선언
 			EgovPasswordEncoder egovPasswordEncoder = new EgovPasswordEncoder();
 			
-			// 비밀번호 암호화
-			String hashed = egovPasswordEncoder.encryptPassword(vo.getPassword());
-			
 			// 이메일 체크
 			int isEmail = userService.emailCheck(vo.getEmail());
+			
+			// 비밀번호 길이
+			int passwordLen = vo.getPassword().length();
 			
 			if (isEmail == 0) {
 				// 일치하는 이메일이 없는 경우
 				
-				// 암호화된 비밀번호로 바꾸기
-				vo.setPassword(hashed);
+				if (passwordLen >= 8 && passwordLen <= 16) {
+	        		// 비밀번호 길이 맞는 경우
+	        		
+	    			// 비밀번호 암호화
+	    			String hashed = egovPasswordEncoder.encryptPassword(vo.getPassword());
+	        		
+					// 암호화된 비밀번호로 바꾸기
+					vo.setPassword(hashed);
+					
+					// 회원가입
+					userService.register(vo);
+					
+					// 결과 전달
+		        	SuccessCode successCode = SuccessCode.REGISTER;
+		        	dataHashMap.put("data", "회원가입 성공");
+		        	Map<String, Object> result =  resultService.successResult(successCode, dataHashMap);
+		        	
+		            return result;
+	        		
+	        	} else {
+	        		// 비밀번호 길이 다른 경우
+	        		
+					// 결과 전달
+		        	ErrorCode errorCode = ErrorCode.PASSWORD_LENGTH;
+		        	dataHashMap.put("data", "비밀번호 길이 오류");
+		        	Map<String, Object> result =  resultService.errorResult(errorCode, dataHashMap);
+
+			        return result;
+	        	}
 				
-				// 회원가입
-				userService.register(vo);
+			} else {		
+	        	// 일치하는 이메일이 있는 경우
 				
-				return "회원가입 성공!";
-				
-			
-			} else {
-				// 일치하는 이메일이 있는 경우
-				return "존재하는 이메일입니다.";
+				// 결과 전달
+	        	ErrorCode errorCode = ErrorCode.DUPLICATE_EMAIL;
+	        	dataHashMap.put("data", "이메일이 존재함");
+	        	Map<String, Object> result =  resultService.errorResult(errorCode, dataHashMap);
+
+		        return result;
 			}
 			
 		} catch (Exception e) {
-			System.out.println("오류 발생:" + e);
-			return "오류 발생:" + e;
+            e.printStackTrace();
+            System.out.println("오류발생 :" + e);
+            Map<String, Object> errorHashMap = new HashMap<>();
+            errorHashMap.put("error", "오류가 발생했습니다.");
+            return errorHashMap;
 		}
 	}
 	
@@ -335,56 +367,62 @@ public class EgovSampleController {
 	public Map<String, Object> login(@RequestBody UserVO vo) throws Exception {
 		try {
 			
+			// 해시맵 선언
+			Map<String, Object> dataHashMap = new HashMap<>();
+			
 			// 인코더 선언
 			EgovPasswordEncoder egovPasswordEncoder = new EgovPasswordEncoder();
-			
-			// 해시맵 선언
-			Map<String, Object> response = new HashMap<>();
-			Map<String, Object> errorResponse = new HashMap<>();
 			
 			// 이메일 체크
 			int isEmail = userService.emailCheck(vo.getEmail());
 			
 			if (isEmail == 0) {
 				// 일치하는 이메일이 없는 경우
-	            errorResponse.put("오류 발생", "일치하는 이메일이 없습니다.");
-	            return errorResponse;
+				
+				// 결과 전달
+	        	ErrorCode errorCode = ErrorCode.EMAIL_NOT_FOUND;
+	        	dataHashMap.put("data", "일치하는 이메일 없음");
+	        	Map<String, Object> result =  resultService.errorResult(errorCode, dataHashMap);
+	        	
+	            return result;
 
 			} else {
-				// 일치하는 이메일이 있는 경우
-				
+	        	// 일치하는 이메일이 있는 경우
+
 				// 유저 정보 가져오기
 				Map<String, Object> user = userService.login(vo);
 				
-				// 비밀번호 일치 여부
+				// 비밀번호 체크
 				Boolean passwordCheck = egovPasswordEncoder.checkPassword(vo.getPassword(), (String) user.get("password"));
 				
 				if (passwordCheck) {
-					
 					// 비밀번호 일치할 경우
 					
-					// 토큰 생성
-					 String accessToken = jwtService.createJwt(vo);
+					String accessToken =  jwtService.createJwt(vo);
+					
+					// 결과 전달
+					SuccessCode successCode = SuccessCode.LOGIN;
+					dataHashMap.put("accessToken", accessToken);
+					Map<String, Object> result =  resultService.successResult(successCode, dataHashMap);
 					 
-					response.put("accessToken", accessToken);
-					
-					return response;
+					 return result;
 				} else {
-					
 					// 비밀번호 일치하지 않을 경우
-		            errorResponse.put("오류 발생", "비밀번호가 일치하지 않습니다.");
-		            
-		            return errorResponse;
+					
+					// 결과 전달
+		        	ErrorCode errorCode = ErrorCode.PASSWORD_NOT_COMPARE;
+		        	dataHashMap.put("test", "비밀번호 다름");
+		        	Map<String, Object> result =  resultService.errorResult(errorCode, dataHashMap);
+		        	
+		            return result;
 				}
 			}
-			
 		} catch (Exception e) {
             e.printStackTrace();
             System.out.println("오류발생 :" + e);
-            
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("error", "유저정보 확인 중 오류가 발생했습니다.");
-            return errorResponse;
+            Map<String, Object> errorHashMap = new HashMap<>();
+            errorHashMap.put("error", "오류가 발생했습니다.");
+            return errorHashMap;
 		}
 
 	}
