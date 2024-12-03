@@ -324,6 +324,7 @@ public class EgovSampleController {
 					// 회원가입
 					userService.register(vo);
 					
+					
 					// 결과 전달
 		        	SuccessCode successCode = SuccessCode.REGISTER;
 		        	dataHashMap.put("data", "회원가입 성공");
@@ -433,22 +434,24 @@ public class EgovSampleController {
 		try {
 			
 			// 해시맵 선언
-			Map<String, Object> response = new HashMap<>();
+			Map<String, Object> dataHashMap = new HashMap<>();
 			
 			// 토큰으로 유저 정보 가져오기
 			Claims userInfo =  jwtService.getData(token.getToken());
 			
-			response.put("userInfo", userInfo);
-			
-			return response;
+			// 결과 전달
+			SuccessCode successCode = SuccessCode.GETUSER;
+			dataHashMap.put("userInfo", userInfo);
+			Map<String, Object> result =  resultService.successResult(successCode, dataHashMap);
+			 
+			return result;
 
 		} catch (Exception e) {
             e.printStackTrace();
             System.out.println("오류발생 :" + e);
-            
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("error", "유저정보를 가져오는 중 오류가 발생했습니다.");
-            return errorResponse;
+            Map<String, Object> errorHashMap = new HashMap<>();
+            errorHashMap.put("error", "오류가 발생했습니다.");
+            return errorHashMap;
 		}
 
 	}
