@@ -29,6 +29,8 @@ import egovframework.example.sample.service.ErrorCode;
 import egovframework.example.sample.service.JwtService;
 import egovframework.example.sample.service.MemberService;
 import egovframework.example.sample.service.MemberVO;
+import egovframework.example.sample.service.ProductService;
+import egovframework.example.sample.service.ProductVO;
 import egovframework.example.sample.service.ResultService;
 import egovframework.example.sample.service.SampleDefaultVO;
 import egovframework.example.sample.service.SampleVO;
@@ -111,14 +113,15 @@ public class EgovSampleController {
 	@Resource(name = "jwtService")
 	private JwtService jwtService;
 	
+	@Resource(name = "productService")
+	private ProductService productService;
+	
 
 
 	
     // 메인 페이지
 	@RequestMapping(value = "/main", method = RequestMethod.GET, produces="application/json;charset=utf-8")
 	public String main() throws Exception {
-		
-			
 		return "메인 페이지";
 		
 	}
@@ -148,7 +151,6 @@ public class EgovSampleController {
 	        		
 	    			// 비밀번호 암호화
 	    			String hashed = egovPasswordEncoder.encryptPassword(vo.getPassword());
-	        		
 					// 암호화된 비밀번호로 바꾸기
 					vo.setPassword(hashed);
 					
@@ -475,7 +477,7 @@ public class EgovSampleController {
 			userService.updateUser(vo);
 			
 			// 새로운 토큰 발급
-			String accessToken =  jwtService.createJwt(vo);
+			String accessToken = jwtService.createJwt(vo);
 			
 			// 결과 전달
 			SuccessCode successCode = SuccessCode.PATCH_USER_INFO;
@@ -618,6 +620,35 @@ public class EgovSampleController {
 	}
 	
 
+    // 상품 목록 조회
+	@RequestMapping(value = "/getProductList", method = RequestMethod.GET, produces="application/json;charset=utf-8")
+	public Map<String, Object> productList() throws Exception {
+		try {
+			
+			// 해시맵 선언
+			Map<String, Object> dataHashMap = new HashMap<>();
+			
+			// 장바구니 목록 가져오기
+			List<ProductVO> getProductList = productService.productList();
+			
+			// 결과 전달
+			SuccessCode successCode = SuccessCode.GET_PRODUCT_LIST;
+			dataHashMap.put("getProductList", getProductList);
+			Map<String, Object> result = resultService.successResult(successCode, dataHashMap);
+			
+			return result;
+			
+		} catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("오류발생 :" + e);
+            Map<String, Object> errorHashMap = new HashMap<>();
+            errorHashMap.put("error", "오류가 발생했습니다.");
+            return errorHashMap;
+		}
+		
+		
+	}
+	
 	/**
 	 * 글 목록을 조회한다. (pageing)
 	 * @param searchVO - 조회할 정보가 담긴 SampleDefaultVO

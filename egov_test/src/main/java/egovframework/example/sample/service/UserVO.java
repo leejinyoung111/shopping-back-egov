@@ -8,7 +8,9 @@ public class UserVO {
 	private String postCode;
 	private String address;
 	private String detailAddress;
+	private String role;
 	
+
 	public int getId() {
 		return id;
 	}
@@ -50,6 +52,12 @@ public class UserVO {
 	}
 	public void setDetailAddress(String detailAddress) {
 		this.detailAddress = detailAddress;
+	}
+	public String getRole() {
+		return role;
+	}
+	public void setRole(String role) {
+		this.role = role;
 	}
 	
 	

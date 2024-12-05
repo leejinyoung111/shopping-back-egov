@@ -10,6 +10,7 @@
 		<result property="postCode" column="postCode"/>
 		<result property="address" column="address"/>
 		<result property="detailAddress" column="detailAddress"/>
+		<result property="role" column="role"/>
 	</resultMap>
 
 	<!-- 이메일 체크 -->
@@ -19,8 +20,8 @@
 	
 	<!-- 회원가입 -->
 	<insert id="register" parameterType="UserVO">
-	insert into user (email, name, password, postCode, address, detailAddress)
-				values (#{email}, #{name}, #{password}, #{postCode}, #{address}, #{detailAddress})
+	insert into user (email, name, password, postCode, address, detailAddress, role)
+				values (#{email}, #{name}, #{password}, #{postCode}, #{address}, #{detailAddress}, #{role})
 
 	</insert>
 	
