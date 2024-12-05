@@ -620,7 +620,7 @@ public class EgovSampleController {
 	}
 	
 
-    // 상품 목록 조회
+    // (관리자) 도서 목록 조회
 	@RequestMapping(value = "/getProductList", method = RequestMethod.GET, produces="application/json;charset=utf-8")
 	public Map<String, Object> productList() throws Exception {
 		try {
@@ -628,7 +628,7 @@ public class EgovSampleController {
 			// 해시맵 선언
 			Map<String, Object> dataHashMap = new HashMap<>();
 			
-			// 장바구니 목록 가져오기
+			// 도서 목록 가져오기
 			List<ProductVO> getProductList = productService.productList();
 			
 			// 결과 전달
@@ -646,8 +646,51 @@ public class EgovSampleController {
             return errorHashMap;
 		}
 		
-		
 	}
+	
+	// (관리자) 도서 추가
+	@RequestMapping(value = "/addProduct", method = RequestMethod.POST, produces="application/json;charset=utf-8", consumes="application/json;charset=utf-8")
+	public Map<String, Object> insertProduct(@RequestBody ProductVO vo) throws Exception{
+		try {
+			
+			// 해시맵 선언
+			Map<String, Object> dataHashMap = new HashMap<>();
+			
+			// 도서아이디 체크
+			int isBookId = productService.bookIdCheck(vo);
+			
+			if (isBookId == 0) {
+				// 등록한 도서가 없는 경우
+				
+				// 도서 추가
+				productService.insertProduct(vo);
+				
+				// 결과 전달
+				SuccessCode successCode = SuccessCode.ADD_PRODUCT;
+				dataHashMap.put("data", "도서 추가 성공");
+				Map<String, Object> result = resultService.successResult(successCode, dataHashMap);
+				 
+				 return result;
+			} else {
+				// 등록한 도서가 있는 경우
+				
+				// 결과 전달
+	        	ErrorCode errorCode = ErrorCode.DUPLICATE_BOOKID;
+	        	dataHashMap.put("data", "일치하는 도서가 있음");
+	        	Map<String, Object> result = resultService.errorResult(errorCode, dataHashMap);
+	        	
+	            return result;
+			}
+			
+		} catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("오류발생 :" + e);
+            Map<String, Object> errorHashMap = new HashMap<>();
+            errorHashMap.put("error", "오류가 발생했습니다.");
+            return errorHashMap;
+		}
+	}
+	
 	
 	/**
 	 * 글 목록을 조회한다. (pageing)
