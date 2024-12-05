@@ -632,7 +632,7 @@ public class EgovSampleController {
 			List<ProductVO> getProductList = productService.productList();
 			
 			// 결과 전달
-			SuccessCode successCode = SuccessCode.GET_PRODUCT_LIST;
+			SuccessCode successCode = SuccessCode.GET_BOOK_LIST;
 			dataHashMap.put("getProductList", getProductList);
 			Map<String, Object> result = resultService.successResult(successCode, dataHashMap);
 			
@@ -666,7 +666,7 @@ public class EgovSampleController {
 				productService.insertProduct(vo);
 				
 				// 결과 전달
-				SuccessCode successCode = SuccessCode.ADD_PRODUCT;
+				SuccessCode successCode = SuccessCode.ADD_BOOK;
 				dataHashMap.put("data", "도서 추가 성공");
 				Map<String, Object> result = resultService.successResult(successCode, dataHashMap);
 				 
@@ -689,6 +689,33 @@ public class EgovSampleController {
             errorHashMap.put("error", "오류가 발생했습니다.");
             return errorHashMap;
 		}
+	}
+	
+    // (관리자) 도서 삭제
+	@RequestMapping(value = "/product/{id}", method = RequestMethod.DELETE, produces="application/json;charset=utf-8")
+	public Map<String, Object> deleteProduct(@PathVariable("id") int id) throws Exception {
+		try {
+			// 해시맵 선언
+			Map<String, Object> dataHashMap = new HashMap<>();
+			
+			// 장바구니 삭제
+			productService.deleteProduct(id);
+			
+			// 결과 전달
+			SuccessCode successCode = SuccessCode.DELETE_BOOK;
+			dataHashMap.put("data", "도서 삭제 성공");
+			Map<String, Object> result = resultService.successResult(successCode, dataHashMap);
+			
+			return result;
+			
+		} catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("오류발생 :" + e);
+            Map<String, Object> errorHashMap = new HashMap<>();
+            errorHashMap.put("error", "오류가 발생했습니다.");
+            return errorHashMap;
+		}
+
 	}
 	
 	
