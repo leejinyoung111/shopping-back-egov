@@ -718,6 +718,33 @@ public class EgovSampleController {
 
 	}
 	
+    // (관리자) 도서 수정
+	@RequestMapping(value = "/updateProduct", method = RequestMethod.PATCH, produces="application/json;charset=utf-8", consumes="application/json;charset=utf-8")
+	public Map<String, Object> updateProduct(@RequestBody ProductVO vo) throws Exception {
+		try {
+			// 해시맵 선언
+			Map<String, Object> dataHashMap = new HashMap<>();
+			
+			// 도서 정보 수정
+			productService.updateProduct(vo);
+			
+			// 결과 전달
+			SuccessCode successCode = SuccessCode.PATCH_BOOK_INFO;
+			dataHashMap.put("data", "도서 정보 수정 성공");
+			Map<String, Object> result = resultService.successResult(successCode, dataHashMap);
+			 
+			 return result;
+			
+		} catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("오류발생 :" + e);
+            Map<String, Object> errorHashMap = new HashMap<>();
+            errorHashMap.put("error", "오류가 발생했습니다.");
+            return errorHashMap;
+		}
+		
+		
+	}
 	
 	/**
 	 * 글 목록을 조회한다. (pageing)
