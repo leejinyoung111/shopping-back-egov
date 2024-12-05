@@ -698,7 +698,7 @@ public class EgovSampleController {
 			// 해시맵 선언
 			Map<String, Object> dataHashMap = new HashMap<>();
 			
-			// 장바구니 삭제
+			// 도서 삭제
 			productService.deleteProduct(id);
 			
 			// 결과 전달
