@@ -293,6 +293,37 @@ public class EgovSampleController {
 
 	}
 	
+	
+	// db 관계 설정 테스트
+	@RequestMapping(value = "/member/{userId}", method = RequestMethod.GET, produces="application/json;charset=utf-8")
+	public Map<String, Object> buytList(@PathVariable("userId") int userId) throws Exception{
+		try {
+			
+			// 해시맵 선언
+			Map<String, Object> dataHashMap = new HashMap<>();
+			
+			// 리스트 조회
+			List<MemberVO> getBuyList = memberService.buytList(userId);
+			
+			
+			// 결과 전달
+			SuccessCode successCode = SuccessCode.GET_CART_LIST;
+			dataHashMap.put("getBuyList", getBuyList);
+			Map<String, Object> result = resultService.successResult(successCode, dataHashMap);
+			
+			return result;
+			
+		} catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("오류발생 :" + e);
+            Map<String, Object> errorHashMap = new HashMap<>();
+            errorHashMap.put("error", "오류가 발생했습니다.");
+            return errorHashMap;
+		}
+		
+	}
+	
+	
 	// 회원가입
 	@RequestMapping(value = "/register", method = RequestMethod.POST, produces="application/json;charset=utf-8", consumes="application/json;charset=utf-8")
 	public Map<String, Object> register(@RequestBody UserVO vo) throws Exception {

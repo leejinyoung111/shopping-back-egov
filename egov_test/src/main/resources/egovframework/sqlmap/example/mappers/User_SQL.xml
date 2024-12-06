@@ -20,8 +20,8 @@
 	
 	<!-- 회원가입 -->
 	<insert id="register" parameterType="UserVO">
-	insert into user (email, name, password, postCode, address, detailAddress, role)
-				values (#{email}, #{name}, #{password}, #{postCode}, #{address}, #{detailAddress}, #{role})
+		insert into user (email, name, password, postCode, address, detailAddress, role)
+					values (#{email}, #{name}, #{password}, #{postCode}, #{address}, #{detailAddress}, #{role})
 
 	</insert>
 	

@@ -1,5 +1,6 @@
 package egovframework.example.sample.service;
 
+import java.util.List;
 import java.util.Map;
 
 public interface MemberService {
@@ -12,6 +13,9 @@ public interface MemberService {
 	
 	// 로그인
 	Map<String, Object> loginMember(MemberVO vo) throws Exception;
+	
+	// 리스트 조회
+	List<MemberVO> buytList(int userId) throws Exception;
 	
 
 }

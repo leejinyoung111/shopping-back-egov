@@ -25,5 +25,13 @@
 		select * from member where email=#{email}
 	</select>
 	
+	<!-- 리스트 조회 -->
+	<select id="buytList"  resultType="HashMap">
+		SELECT member.id, member.email, buy.title FROM member 
+		INNER JOIN buy ON(member.id = buy.memberId)
+		WHERE member.id=#{userId}
+		;
+	</select>
+	
 	
 </mapper>

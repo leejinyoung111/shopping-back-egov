@@ -1,12 +1,12 @@
 package egovframework.example.sample.service.impl;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
 
 import org.egovframe.rte.fdl.cmmn.EgovAbstractServiceImpl;
 import org.springframework.stereotype.Service;
-
 import egovframework.example.sample.service.MemberService;
 import egovframework.example.sample.service.MemberVO;
 
@@ -39,6 +39,15 @@ public class MemberServiceImpl extends EgovAbstractServiceImpl implements Member
 			throw processException("info.nodata.msg");
 		return resultVO;
 	}
+	
+	// 리스트 조회
+	@Override
+	public List<MemberVO> buytList(int userId) throws Exception{
+		List<MemberVO> resultVO = memberDAO.buytList(userId);
+		if (resultVO == null)
+			throw processException("info.nodata.msg");
+		return resultVO;
+	};
 	
 	
 }
