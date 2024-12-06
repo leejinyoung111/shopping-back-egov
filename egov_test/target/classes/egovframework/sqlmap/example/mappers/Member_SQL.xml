@@ -1,11 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="egovframework.example.sample.service.impl.MemberMapper">
-	<select id="select_membercount" resultType="int">
-		select count(*) from member
+
+	<resultMap id="member" type="egovframework.example.sample.service.MemberVO">
+		<id property="id" column="id"/>
+		<result property="email" column="email"/>
+		<result property="password" column="password"/>
+	</resultMap>
+
+	<!-- 이메일 체크 -->
+	<select id="testEmail" resultType="int">
+		select count(*) from member where email=#{email}
 	</select>
 	
-	<select id="selectName" resultType="string">
-		SELECT name from member WHERE id = 1;
+	<!-- 회원가입 -->
+		<insert id="insertMember" parameterType="MemberVO">
+	insert into member (email, password)
+				values (#{email}, #{password})
+
+	</insert>
+	
+	<!-- 로그인 -->
+	<select id="loginMember" resultType="HashMap">
+		select * from member where email=#{email}
 	</select>
+	
+	
 </mapper>

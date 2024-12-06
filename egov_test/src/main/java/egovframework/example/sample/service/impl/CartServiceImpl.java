@@ -1,7 +1,6 @@
 package egovframework.example.sample.service.impl;
 
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -9,6 +8,7 @@ import org.egovframe.rte.fdl.cmmn.EgovAbstractServiceImpl;
 import org.springframework.stereotype.Service;
 
 import egovframework.example.sample.service.CartService;
+import egovframework.example.sample.service.CartUpdateVO;
 import egovframework.example.sample.service.CartVO;
 
 @Service("cartService")
@@ -47,5 +47,11 @@ public class CartServiceImpl extends EgovAbstractServiceImpl implements CartServ
 		cartDAO.deleteCart(id);
 		return "장바구니 삭제 성공!";
 	};
+	
+	// 상품 수량 변경
+	@Override
+	public void updateProductCount(CartUpdateVO vo) throws Exception {
+		cartDAO.updateProductCount(vo);
+	}
 
 }
