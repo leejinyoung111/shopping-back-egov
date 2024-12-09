@@ -27,8 +27,6 @@ import egovframework.example.sample.service.CartVO;
 import egovframework.example.sample.service.EgovSampleService;
 import egovframework.example.sample.service.ErrorCode;
 import egovframework.example.sample.service.JwtService;
-import egovframework.example.sample.service.MemberService;
-import egovframework.example.sample.service.MemberVO;
 import egovframework.example.sample.service.ProductService;
 import egovframework.example.sample.service.ProductVO;
 import egovframework.example.sample.service.ResultService;
@@ -57,6 +55,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springmodules.validation.commons.DefaultBeanValidator;
+
 
 /**
  * @Class Name : EgovSampleController.java
@@ -97,11 +96,9 @@ public class EgovSampleController {
 	 
 	@Autowired
 	
-	@Resource(name = "memberService")
-	private MemberService memberService;
-	
 	@Resource(name = "resultService")
 	private ResultService resultService;
+	
 	
 	
 	@Resource(name = "userService")
@@ -126,204 +123,6 @@ public class EgovSampleController {
 		
 	}
 	
-	// 회원가입 에러처리 테스트
-	@RequestMapping(value = "/errorInsertMember", method = RequestMethod.POST, produces="application/json;charset=utf-8", consumes="application/json;charset=utf-8")
-	public Map<String, Object> errorInsertMember(@RequestBody MemberVO vo) throws Exception {
-		try {
-			
-			// 해시맵 선언
-			Map<String, Object> testHashMap = new HashMap<>();
-			
-			// 인코더 선언
-			EgovPasswordEncoder egovPasswordEncoder = new EgovPasswordEncoder();
-			
-			// 이메일 체크
-			int isEmail = memberService.testEmail(vo.getEmail());
-			
-			// 비밀번호 길이
-			int passwordLen = vo.getPassword().length();
-			
-	        if(isEmail == 0) {
-				// 일치하는 이메일이 없는 경우
-	        	
-	        	if (passwordLen >= 8 && passwordLen <= 16) {
-	        		// 비밀번호 길이 체크
-	        		
-	    			// 비밀번호 암호화
-	    			String hashed = egovPasswordEncoder.encryptPassword(vo.getPassword());
-					// 암호화된 비밀번호로 바꾸기
-					vo.setPassword(hashed);
-					
-					// 회원가입
-					memberService.insertMember(vo);
-					
-		        	SuccessCode successCode = SuccessCode.REGISTER;
-		        	testHashMap.put("test", "회원가입 성공");
-		        	
-		        	Map<String, Object> result =  resultService.successResult(successCode, testHashMap);
-		        	
-		        	
-		            return result;
-	        		
-	        	} else {
-	        		
-		        	ErrorCode errorCode = ErrorCode.PASSWORD_LENGTH;
-		        	testHashMap.put("test", "비밀번호 길이 오류");
-		        	
-		        	Map<String, Object> result =  resultService.errorResult(errorCode, testHashMap);
-		       
-		        	
-			        return result;
-			        
-	        	}
-
-	        } else {
-	        	// 일치하는 이메일이 있는 경우
-	        	
-	        	ErrorCode errorCode = ErrorCode.DUPLICATE_EMAIL;
-	        	testHashMap.put("test", "이메일 있음");
-	        	
-	        	Map<String, Object> result =  resultService.errorResult(errorCode, testHashMap);
-
-		        return result;
-	        }
-			
-		} catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("오류발생 :" + e);
-            
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("error", "오류가 발생했습니다.");
-            return errorResponse;
-		}
-	}
-	
-	// 로그인 에러처리 테스트
-	@RequestMapping(value = "/loginMember", method = RequestMethod.POST, produces="application/json;charset=utf-8", consumes="application/json;charset=utf-8")
-	public Map<String, Object> errorLoginMember(@RequestBody MemberVO vo) throws Exception {
-		try {
-			
-			// 해시맵 선언
-			Map<String, Object> testHashMap = new HashMap<>();
-			
-			
-			// 인코더 선언
-			EgovPasswordEncoder egovPasswordEncoder = new EgovPasswordEncoder();
-			
-			// 이메일 체크
-			int isEmail = memberService.testEmail(vo.getEmail());
-			
-			if (isEmail == 0) {
-				
-	        	ErrorCode errorCode = ErrorCode.EMAIL_NOT_FOUND;
-	        	testHashMap.put("test", "이메일 없음");
-	        	
-	        	Map<String, Object> result =  resultService.errorResult(errorCode, testHashMap);
-	        	
-	            return result;
-
-			} else {
-				// 일치하는 이메일이 있는 경우
-				
-				// 유저 정보 가져오기
-				Map<String, Object> user = memberService.loginMember(vo);
-				
-				// 비밀번호 일치 여부
-				Boolean passwordCheck = egovPasswordEncoder.checkPassword(vo.getPassword(), (String) user.get("password"));
-				
-				if (passwordCheck) {
-					
-					// 비밀번호 일치할 경우
-					 
-					 SuccessCode successCode = SuccessCode.LOGIN;
-					 testHashMap.put("test", "로그인 성공");
-					 
-					 Map<String, Object> result =  resultService.successResult(successCode, testHashMap);
-					 
-					 return result;
-				} else {
-					// 비밀번호 일치하지 않을 경우
-					
-		        	ErrorCode errorCode = ErrorCode.PASSWORD_NOT_COMPARE;
-		        	
-				   	testHashMap.put("test", "비밀번호 다름");
-		        	
-		        	Map<String, Object> result =  resultService.errorResult(errorCode, testHashMap);
-		        	
-		            return result;
-				}
-			}
-			
-		} catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("오류발생 :" + e);
-            
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("error", "유저정보 확인 중 오류가 발생했습니다.");
-            return errorResponse;
-		}
-	}
-	
-	// 유저 정보 가져오기 에러처리 테스트
-	@RequestMapping(value = "/getErrorMember", method = RequestMethod.POST, produces="application/json;charset=utf-8", consumes="application/json;charset=utf-8")
-	public Map<String, Object> getErrorMember(@RequestBody TokenVO token) throws Exception {
-		try {
-			
-			// 해시맵 선언
-			Map<String, Object> testHashMap = new HashMap<>();
-			
-			// 토큰으로 유저 정보 가져오기
-			Claims userInfo = jwtService.getData(token.getToken());
-			
-			 SuccessCode successCode = SuccessCode.GET_USER;
-			 testHashMap.put("userInfo", userInfo);
-			 
-			 Map<String, Object> result =  resultService.successResult(successCode, testHashMap);
-			 
-			 return result;
-
-		} catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("오류발생 :" + e);
-            
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("error", "유저정보를 가져오는 중 오류가 발생했습니다.");
-            return errorResponse;
-		}
-
-	}
-	
-	
-	// db 관계 설정 테스트
-	@RequestMapping(value = "/member/{userId}", method = RequestMethod.GET, produces="application/json;charset=utf-8")
-	public Map<String, Object> buytList(@PathVariable("userId") int userId) throws Exception{
-		try {
-			
-			// 해시맵 선언
-			Map<String, Object> dataHashMap = new HashMap<>();
-			
-			// 리스트 조회
-			List<MemberVO> getBuyList = memberService.buytList(userId);
-			
-			
-			// 결과 전달
-			SuccessCode successCode = SuccessCode.GET_CART_LIST;
-			dataHashMap.put("getBuyList", getBuyList);
-			Map<String, Object> result = resultService.successResult(successCode, dataHashMap);
-			
-			return result;
-			
-		} catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("오류발생 :" + e);
-            Map<String, Object> errorHashMap = new HashMap<>();
-            errorHashMap.put("error", "오류가 발생했습니다.");
-            return errorHashMap;
-		}
-		
-	}
-	
-	
 	// 회원가입
 	@RequestMapping(value = "/register", method = RequestMethod.POST, produces="application/json;charset=utf-8", consumes="application/json;charset=utf-8")
 	public Map<String, Object> register(@RequestBody UserVO vo) throws Exception {
@@ -331,6 +130,7 @@ public class EgovSampleController {
 			
 			// 해시맵 선언
 			Map<String, Object> dataHashMap = new HashMap<>();
+	     
 			
 			// 인코더 선언
 			EgovPasswordEncoder egovPasswordEncoder = new EgovPasswordEncoder();
@@ -340,7 +140,7 @@ public class EgovSampleController {
 			
 			// 비밀번호 길이
 			int passwordLen = vo.getPassword().length();
-			
+		
 			if (isEmail == 0) {
 				// 일치하는 이메일이 없는 경우
 				

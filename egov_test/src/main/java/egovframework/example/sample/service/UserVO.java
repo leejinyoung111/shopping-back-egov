@@ -1,6 +1,8 @@
 package egovframework.example.sample.service;
 
 public class UserVO {
+
+	
 	private int id;
 	private String email;
 	private String name;
