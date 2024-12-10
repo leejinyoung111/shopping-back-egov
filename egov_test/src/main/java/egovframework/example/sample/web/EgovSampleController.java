@@ -100,7 +100,6 @@ public class EgovSampleController {
 	private ResultService resultService;
 	
 	
-	
 	@Resource(name = "userService")
 	private UserService userService;
 	
