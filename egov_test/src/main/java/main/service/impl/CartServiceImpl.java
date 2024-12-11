@@ -1,4 +1,4 @@
-package egovframework.example.sample.service.impl;
+package main.service.impl;
 
 import java.util.List;
 
@@ -7,14 +7,13 @@ import javax.annotation.Resource;
 import org.egovframe.rte.fdl.cmmn.EgovAbstractServiceImpl;
 import org.springframework.stereotype.Service;
 
-import egovframework.example.sample.service.CartService;
-import egovframework.example.sample.service.CartUpdateVO;
-import egovframework.example.sample.service.CartVO;
+import main.service.CartService;
+import main.service.CartUpdateVO;
+import main.service.CartVO;
 
 @Service("cartService")
 public class CartServiceImpl extends EgovAbstractServiceImpl implements CartService {
 	
-
 	@Resource(name="cartMapper")
 	private CartMapper cartDAO;
 	

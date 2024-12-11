@@ -1,4 +1,4 @@
-package egovframework.example.sample.service.impl;
+package main.service.impl;
 
 import java.util.Map;
 
@@ -6,15 +6,16 @@ import javax.annotation.Resource;
 
 import org.egovframe.rte.fdl.cmmn.EgovAbstractServiceImpl;
 import org.springframework.stereotype.Service;
-import egovframework.example.sample.service.UserService;
-import egovframework.example.sample.service.UserVO;
+
+import main.service.UserService;
+import main.service.UserVO;
 
 @Service("userService")
 public class UserServiceImpl extends EgovAbstractServiceImpl implements UserService {
-
+	
 	@Resource(name="userMapper")
 	private UserMapper userDAO;
-	
+
 	// 이메일 체크
 	@Override
 	public int emailCheck(String email) throws Exception {

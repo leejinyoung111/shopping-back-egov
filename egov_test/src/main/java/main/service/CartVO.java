@@ -1,7 +1,6 @@
-package egovframework.example.sample.service;
+package main.service;
 
 public class CartVO {
-	
 	private int id;
 	private int userId;
 	private String bookId;
@@ -10,6 +9,7 @@ public class CartVO {
 	private String thumbnail;
 	private String publisher;
 	private int count;
+
 	
 	public int getId() {
 		return id;
