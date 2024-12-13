@@ -1,5 +1,6 @@
 package egovframework.example.sample.service;
 
+
 public class MemberVO {
 	private int id;
 	private String email;
@@ -23,7 +24,6 @@ public class MemberVO {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-	
-	
 
+	
 }

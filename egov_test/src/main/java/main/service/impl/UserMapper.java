@@ -1,13 +1,14 @@
-package egovframework.example.sample.service.impl;
+package main.service.impl;
 
 import java.util.Map;
 
 import org.egovframe.rte.psl.dataaccess.mapper.Mapper;
-import egovframework.example.sample.service.UserVO;
+
+import main.service.UserVO;
 
 @Mapper("userMapper")
 public interface UserMapper {
-	
+
 	// 이메일 체크
 	int emailCheck(String email) throws Exception;
 	

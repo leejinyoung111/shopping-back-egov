@@ -1,5 +1,6 @@
 package egovframework.example.sample.service.impl;
 
+import java.util.List;
 import java.util.Map;
 
 import org.egovframe.rte.psl.dataaccess.mapper.Mapper;
@@ -17,5 +18,8 @@ public interface MemberMapper {
 	
 	// 로그인
 	Map<String, Object> loginMember(MemberVO vo) throws Exception;
+	
+	// 리스트 조회
+	List<MemberVO> buytList(int userId) throws Exception;
 
 }

@@ -1,12 +1,11 @@
-package egovframework.example.sample.service.impl;
+package main.service.impl;
 
 import java.util.List;
-import java.util.Map;
 
 import org.egovframe.rte.psl.dataaccess.mapper.Mapper;
 
-import egovframework.example.sample.service.CartUpdateVO;
-import egovframework.example.sample.service.CartVO;
+import main.service.CartUpdateVO;
+import main.service.CartVO;
 
 @Mapper("cartMapper")
 public interface CartMapper {
