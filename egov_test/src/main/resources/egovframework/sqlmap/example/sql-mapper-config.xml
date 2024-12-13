@@ -8,6 +8,7 @@
 		<typeAlias alias="cartVO" type="main.service.CartVO"/>
 		<typeAlias alias="productVO" type="main.service.ProductVO"/>
 		<typeAlias alias="orderVO" type="main.service.OrderVO"/>
+		<typeAlias alias="orderItemVO" type="main.service.OrderItemVO"/>
 		<typeAlias alias="searchVO" type="egovframework.example.sample.service.SampleDefaultVO"/>
 		<typeAlias alias="sampleVO" type="egovframework.example.sample.service.SampleVO"/>
     </typeAliases>
