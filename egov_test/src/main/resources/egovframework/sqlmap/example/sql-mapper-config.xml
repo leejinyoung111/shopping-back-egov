@@ -4,6 +4,9 @@
 <configuration>
     <typeAliases>
 		<typeAlias alias="egovMap" type="org.egovframe.rte.psl.dataaccess.util.EgovMap"/>
+		<typeAlias alias="person" type="main.service.Person"/>
+		<typeAlias alias="board" type="main.service.Board"/>
+		<typeAlias alias="like" type="main.service.Like"/>
 		<typeAlias alias="userMainVO" type="main.service.UserMainVO"/>
 		<typeAlias alias="userAddressVO" type="main.service.UserAddressVO"/>
 		<typeAlias alias="cartVO" type="main.service.CartVO"/>
