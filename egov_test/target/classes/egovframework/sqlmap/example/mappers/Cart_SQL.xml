@@ -3,29 +3,29 @@
 <mapper namespace="main.service.impl.CartMapper">
 	<resultMap id="cart" type="main.service.CartVO">
 		<id property="id" column="id"/>
-		<result property="userId" column="userId"/>
-		<result property="bookId" column="bookId"/>
+		<result property="user_id" column="user_id"/>
+		<result property="book_id" column="book_id"/>
 		<result property="title" column="title"/>
 		<result property="price" column="price"/>
-		<result property="thumbnail" column="thumbnail"/>
+		<result property="thumb_nail" column="thumb_nail"/>
 		<result property="publisher" column="publisher"/>
 		<result property="count" column="count"/>
 	</resultMap>
 	
 	<!-- 장바구니 목록 조회 -->
 	<select id="cartList"  resultType="HashMap">
-		select * from cart where userId=#{userId}
+		select * from cart where user_id=#{user_id}
 	</select>
 	
 	<!-- 상품 체크 -->
 	<select id="productCheck" resultType="int">
-		select count(*) from cart where userId=#{userId} and bookId=#{bookId}
+		select count(*) from cart where user_id=#{user_id} and book_id=#{book_id}
 	</select>
 	
 	<!-- 장바구니 추가 -->
 	<insert id="insertCart" parameterType="CartVO">
-		insert into cart (userId, bookId, title, price, thumbnail, publisher, count)
-				values ( #{userId}, #{bookId}, #{title}, #{price}, #{thumbnail}, #{publisher}, #{count})
+		insert into cart (user_id, book_id, title, price, thumb_nail, publisher, count)
+				values ( #{user_id}, #{book_id}, #{title}, #{price}, #{thumb_nail}, #{publisher}, #{count})
 
 	</insert>
 	

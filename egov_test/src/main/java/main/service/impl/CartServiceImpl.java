@@ -19,8 +19,8 @@ public class CartServiceImpl extends EgovAbstractServiceImpl implements CartServ
 	
 	// 장바구니 조회
 	@Override
-	public List<CartVO> cartList(int userId) throws Exception{
-		List<CartVO> resultVO = cartDAO.cartList(userId);
+	public List<CartVO> cartList(int user_id) throws Exception{
+		List<CartVO> resultVO = cartDAO.cartList(user_id);
 		if (resultVO == null)
 			throw processException("info.nodata.msg");
 		return resultVO;
