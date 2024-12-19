@@ -11,7 +11,7 @@ import main.service.CartVO;
 public interface CartMapper {
 	
 	// 장바구니 조회
-	List<CartVO> cartList(int userId) throws Exception;
+	List<CartVO> cartList(int user_id) throws Exception;
 	
 	// 상품 체크
 	int productCheck(CartVO vo) throws Exception;

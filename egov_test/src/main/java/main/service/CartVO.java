@@ -2,14 +2,13 @@ package main.service;
 
 public class CartVO {
 	private int id;
-	private int userId;
-	private String bookId;
+	private int user_id;
+	private String book_id;
 	private String title;
 	private int price;
-	private String thumbnail;
+	private String thumb_nail;
 	private String publisher;
 	private int count;
-
 	
 	public int getId() {
 		return id;
@@ -17,17 +16,17 @@ public class CartVO {
 	public void setId(int id) {
 		this.id = id;
 	}
-	public int getUserId() {
-		return userId;
+	public int getUser_id() {
+		return user_id;
 	}
-	public void setUserId(int userId) {
-		this.userId = userId;
+	public void setUser_id(int user_id) {
+		this.user_id = user_id;
 	}
-	public String getBookId() {
-		return bookId;
+	public String getBook_id() {
+		return book_id;
 	}
-	public void setBookId(String bookId) {
-		this.bookId = bookId;
+	public void setBook_id(String book_id) {
+		this.book_id = book_id;
 	}
 	public String getTitle() {
 		return title;
@@ -41,11 +40,11 @@ public class CartVO {
 	public void setPrice(int price) {
 		this.price = price;
 	}
-	public String getThumbnail() {
-		return thumbnail;
+	public String getThumb_nail() {
+		return thumb_nail;
 	}
-	public void setThumbnail(String thumbnail) {
-		this.thumbnail = thumbnail;
+	public void setThumb_nail(String thumb_nail) {
+		this.thumb_nail = thumb_nail;
 	}
 	public String getPublisher() {
 		return publisher;
